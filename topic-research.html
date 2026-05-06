@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI如何革新传媒行业选题策划——热点追踪、趋势预测、智能选题推荐">
+  <title>选题策划 | AI × 传媒变革</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Detail page specific overrides */
+    .detail-hero {
+      min-height: 50vh;
+      padding-top: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--theme-color) 8%, transparent) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 70%, rgba(124, 58, 237, 0.06) 0%, transparent 50%);
+    }
+    .detail-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+    .detail-section {
+      margin-bottom: 48px;
+    }
+    .detail-section h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: var(--theme-color, var(--cyan));
+    }
+    .detail-section p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+    .detail-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      padding-left: 24px;
+    }
+    .detail-section li {
+      margin-bottom: 8px;
+    }
+    .detail-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 24px;
+      transition: color 0.3s;
+    }
+    .detail-back:hover {
+      color: var(--cyan);
+    }
+    .detail-highlight {
+      background: color-mix(in srgb, var(--theme-color) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--theme-color) 20%, transparent);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 16px 0;
+    }
+    .detail-highlight strong {
+      color: var(--theme-color);
+      font-size: 24px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .detail-highlight span {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body style="--theme-color: var(--orange);">
+  <nav class="navbar">
+    <div class="navbar__logo">
+      <div class="navbar__logo-icon">A</div>
+      <span class="navbar__logo-text">AI × 传媒变革</span>
+    </div>
+    <div class="navbar__links">
+      <a href="index.html" class="navbar__link">首页</a>
+      <a href="index.html#topic" class="navbar__link navbar__link--active">选题策划</a>
+      <a href="index.html#produce" class="navbar__link">内容生产</a>
+      <a href="index.html#review" class="navbar__link">审核校对</a>
+      <a href="index.html#distribute" class="navbar__link">智能分发</a>
+      <a href="index.html#insight" class="navbar__link">数据洞察</a>
+      <a href="index.html#future" class="navbar__link">未来展望</a>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="hero__grid-bg"></div>
+    <div class="hero__content">
+      <div class="hero__badge">🔥 选题策划</div>
+      <h1 class="hero__title">让 AI 成为你的<span style="color: var(--orange)">首席情报官</span></h1>
+      <p class="hero__subtitle">实时追踪全网热点，预测话题趋势，智能推荐最优选题方向<br>告别"拍脑袋"决策，让数据驱动每一个选题</p>
+    </div>
+  </section>
+
+  <main class="detail-content">
+    <a href="index.html" class="detail-back">← 返回首页</a>
+
+    <article class="detail-section">
+      <h3>场景一：热点追踪</h3>
+      <p>传统的新闻热点发现依赖编辑的经验和直觉，往往存在滞后性。AI 驱动的热点追踪系统通过实时监测全网数十个平台的数据流，能够在热点萌芽阶段就发出预警，让媒体机构抢占报道先机。</p>
+      <ul>
+        <li><strong>全网监测覆盖</strong>：同时追踪微博、抖音、微信公众号、知乎、B站、新闻客户端等主流平台，以及海外社交媒体的数据流</li>
+        <li><strong>秒级发现速度</strong>：基于流式数据处理架构，热点事件从发生到被系统识别平均仅需 5 分钟</li>
+        <li><strong>多维度热度评估</strong>：综合考量传播速度、参与人数、情感倾向、地域分布等指标，生成全面的热度画像</li>
+        <li><strong>智能去重关联</strong>：自动识别同一事件在不同平台的表述差异，避免重复跟踪，并将相关子话题聚类</li>
+      </ul>
+      <div class="detail-highlight">
+        <strong>5min</strong>
+        <span>热点发现速度——从事件发生到系统预警的平均时间</span>
+      </div>
+    </article>
+
+    <article class="detail-section">
+      <h3>场景二：趋势预测</h3>
+      <p>AI 不仅能告诉你"现在什么火"，更能预测"什么即将火"。通过分析历史数据中的传播规律、周期性特征和影响因素，趋势预测模型能够为编辑团队提供具有前瞻性的选题建议。</p>
+      <ul>
+        <li><strong>历史模式学习</strong>：基于过去 3-5 年的话题传播数据，训练深度学习模型识别"爆火前兆"的典型特征</li>
+        <li><strong>多因素建模</strong>：综合考虑时间周期（节假日、两会、体育赛事等）、社会情绪、关联事件、KOL 动态等多维度因素</li>
+        <li><strong>预测准确度验证</strong>：模型在内部测试集上达到 92% 的短期趋势（24-72 小时）预测准确率</li>
+        <li><strong>置信度分级</strong>：每个预测结果附带置信度评分，帮助编辑判断风险与机会的平衡</li>
+      </ul>
+      <div class="detail-highlight">
+        <strong>92%</strong>
+        <span>趋势预测准确率——短期趋势（24-72 小时）的预测命中比例</span>
+      </div>
+    </article>
+
+    <article class="detail-section">
+      <h3>场景三：选题推荐</h3>
+      <p>每个媒体机构都有自己的定位、受众和风格。AI 选题推荐系统不仅考虑话题本身的热度，更将媒体的品牌定位、历史表现数据、受众画像和竞争格局纳入推荐模型，实现"千人千面"的个性化选题建议。</p>
+      <ul>
+        <li><strong>媒体定位匹配</strong>：分析媒体的历史内容库，自动学习其风格偏好、擅长领域和价值观取向</li>
+        <li><strong>受众画像分析</strong>：基于用户阅读行为数据，构建受众兴趣图谱，推荐最可能引发共鸣的话题</li>
+        <li><strong>差异化竞争</strong>：监测竞品媒体的选题动向，推荐"蓝海"话题——受众关注度高但竞品覆盖少的领域</li>
+        <li><strong>选题组合优化</strong>：不只是推荐单个选题，而是提供一整组选题组合建议，确保内容矩阵的均衡覆盖</li>
+      </ul>
+      <div class="detail-highlight">
+        <strong>3×</strong>
+        <span>爆款选题命中率——相比传统人工选题方式的提升倍数</span>
+      </div>
+    </article>
+
+    <article class="detail-section">
+      <h3>数据与趋势</h3>
+      <p>AI 选题策划技术正在从辅助工具向核心基础设施演进。头部媒体机构已普遍部署相关系统，行业采用率持续攀升。</p>
+      <ul>
+        <li><strong>行业采用率</strong>：78% 的头部媒体机构已引入 AI 辅助选题工具，其中 45% 将其纳入日常采编流程</li>
+        <li><strong>效率提升</strong>：使用 AI 选题系统的编辑团队，日均选题产出量提升 2.5 倍，选题会时长缩短 60%</li>
+        <li><strong>未来方向</strong>：从"推荐选题"向"预测选题"进化——AI 将具备提前 7-14 天预判社会话题走向的能力</li>
+        <li><strong>人机协作趋势</strong>：编辑角色从"选题决策者"转变为"选题策展人"——负责评估 AI 建议、把控价值导向、注入人文关怀</li>
+      </ul>
+      <div class="detail-highlight">
+        <strong>78%</strong>
+        <span>头部媒体 AI 选题工具采用率</span>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="navbar__logo">
+        <div class="navbar__logo-icon">A</div>
+        <span class="navbar__logo-text">AI × 传媒变革</span>
+      </div>
+      <div class="footer__links">
+        <a href="index.html">首页</a>
+        <a href="#">关于我们</a>
+        <a href="#">联系方式</a>
+      </div>
+      <div class="footer__copyright">© 2026 AI × 传媒变革. 技术引领，探索未来.</div>
+    </div>
+  </footer>
+  <script src="scripts.js"></script>
+</body>
+</html>
