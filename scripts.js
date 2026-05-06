@@ -25,4 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
     el.classList.add('reveal');
     observer.observe(el);
   });
+
+  // Smooth scroll to anchor on page load (for detail page deep links)
+  if (window.location.hash) {
+    const target = document.querySelector(window.location.hash);
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
 });
