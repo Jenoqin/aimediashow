@@ -3,44 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI × 媒体未来</title>
+  <meta name="description" content="探索AI如何重塑传媒行业——从选题策划到内容分发，了解人工智能对媒体人工作方式的六大变革">
+  <meta name="keywords" content="AI,人工智能,传媒行业,新闻媒体,内容生产,智能分发">
+  <meta name="author" content="HW">
+  <meta property="og:title" content="AI 正在重塑传媒行业">
+  <meta property="og:description" content="探索AI如何重塑传媒行业——从选题策划到内容分发">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="./">
+  <title>AI 正在重塑传媒行业</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="navbar__logo">
       <div class="navbar__logo-icon">A</div>
-      <span class="navbar__logo-text">AI × 媒体未来</span>
+      <span class="navbar__logo-text">AI × 传媒变革</span>
     </div>
     <div class="navbar__links">
       <a href="#" class="navbar__link navbar__link--active">首页</a>
-      <a href="#scene-cyan" class="navbar__link">AI内容生产</a>
-      <a href="#scene-purple" class="navbar__link">智能分发</a>
-      <a href="#scene-gold" class="navbar__link">多媒体处理</a>
-      <a href="#scene-green" class="navbar__link">数据洞察</a>
+      <a href="#topic" class="navbar__link">选题策划</a>
+      <a href="#produce" class="navbar__link">内容生产</a>
+      <a href="#review" class="navbar__link">审核校对</a>
+      <a href="#distribute" class="navbar__link">智能分发</a>
+      <a href="#insight" class="navbar__link">数据洞察</a>
+      <a href="#future" class="navbar__link">未来展望</a>
     </div>
     <a href="#cta" class="navbar__cta">联系我们</a>
   </nav>
+
   <section class="hero">
     <div class="hero__grid-bg"></div>
     <div class="hero__content">
-      <div class="hero__badge">2026 · 媒体行业AI转型指南</div>
+      <div class="hero__badge">2026 · 传媒行业 AI 变革观察</div>
       <h1 class="hero__title">
-        当AI重新定义<br>
-        <span class="hero__title-gradient">新闻的生产与传播</span>
+        AI 正在重塑<br>
+        <span class="hero__title-gradient">传媒行业的每一个环节</span>
       </h1>
       <p class="hero__subtitle">
-        从选题策划到内容生成，从精准推送到效果评估<br>
-        AI正在每一个环节重塑媒体行业的运作方式
+        从选题策划到内容分发，从事实核查到趋势预判<br>
+        探索人工智能技术如何重新定义媒体人的工作方式
       </p>
       <div class="hero__buttons">
-        <a href="#scene-cyan" class="btn btn--primary">探索AI如何改变媒体</a>
-        <a href="#" class="btn btn--outline">下载行业报告</a>
+        <a href="#topic" class="btn btn--primary">探索六大变革场景</a>
+        <a href="#" class="btn btn--outline">下载行业观察报告</a>
       </div>
       <div class="hero__stats">
         <div class="hero__stat">
           <div class="hero__stat-value" style="color: var(--cyan)">78%</div>
-          <div class="hero__stat-label">媒体机构已采纳AI</div>
+          <div class="hero__stat-label">头部媒体已引入 AI 工具</div>
         </div>
         <div class="hero__stat">
           <div class="hero__stat-value" style="color: var(--purple)">3.2×</div>
@@ -48,39 +58,81 @@
         </div>
         <div class="hero__stat">
           <div class="hero__stat-value" style="color: var(--gold)">96%</div>
-          <div class="hero__stat-label">分发精准度</div>
+          <div class="hero__stat-label">智能分发精准度</div>
         </div>
         <div class="hero__stat">
           <div class="hero__stat-value" style="color: var(--green)">50%</div>
           <div class="hero__stat-label">运营成本降低</div>
         </div>
       </div>
-      <div class="hero__scroll-hint">↓ 向下滚动探索</div>
+      <div class="hero__scroll-hint">向下滚动探索 ↓</div>
     </div>
   </section>
-  <section id="scene-cyan" class="scene scene--cyan">
+
+  <section id="topic" class="scene scene--orange" aria-labelledby="topic-title">
     <div class="scene__divider"></div>
     <div class="scene__label">
-      <div class="scene__icon">📝</div>
-      <span class="scene__label-text">AI内容生产</span>
+      <div class="scene__icon">🔥</div>
+      <span class="scene__label-text">选题策划</span>
     </div>
-    <h2 class="scene__title">让AI成为你的<em>首席编辑</em></h2>
-    <p class="scene__desc">从选题策划到稿件生成，从质量审核到多语言适配<br>AI覆盖内容生产全链路</p>
+    <h2 id="topic-title" class="scene__title">让 AI 成为你的<em>首席情报官</em></h2>
+    <p class="scene__desc">实时追踪全网热点，预测话题趋势，智能推荐最优选题方向<br>告别"拍脑袋"决策，让数据驱动每一个选题</p>
     <div class="scene__cards">
       <div class="scene__card">
-        <div class="scene__card-icon">✍️</div>
+        <div class="scene__card-icon">📈</div>
+        <div class="scene__card-title">热点追踪</div>
+        <div class="scene__card-desc">全网多平台实时监测，秒级发现正在发酵的热点事件</div>
+      </div>
+      <div class="scene__card">
+        <div class="scene__card-icon">🔮</div>
+        <div class="scene__card-title">趋势预测</div>
+        <div class="scene__card-desc">基于历史数据和传播模型，预判话题热度走向</div>
+      </div>
+      <div class="scene__card">
+        <div class="scene__card-icon">💡</div>
+        <div class="scene__card-title">选题推荐</div>
+        <div class="scene__card-desc">结合媒体定位与受众画像，智能匹配高价值选题</div>
+      </div>
+    </div>
+    <div class="scene__data">
+      <div class="scene__data-item">
+        <div class="scene__data-value">5min</div>
+        <div class="scene__data-label">热点发现速度</div>
+      </div>
+      <div class="scene__data-item">
+        <div class="scene__data-value">92%</div>
+        <div class="scene__data-label">趋势预测准确率</div>
+      </div>
+      <div class="scene__data-item">
+        <div class="scene__data-value">3×</div>
+        <div class="scene__data-label">爆款选题命中率</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="produce" class="scene scene--cyan" aria-labelledby="produce-title">
+    <div class="scene__divider"></div>
+    <div class="scene__label">
+      <div class="scene__icon">✍️</div>
+      <span class="scene__label-text">内容生产</span>
+    </div>
+    <h2 id="produce-title" class="scene__title">让 AI 成为你的<em>首席编辑</em></h2>
+    <p class="scene__desc">从文字稿件到多媒体内容，AI 覆盖内容生产全链路<br>让创作者专注于思考，将重复劳动交给智能助手</p>
+    <div class="scene__cards">
+      <div class="scene__card">
+        <div class="scene__card-icon">📝</div>
         <div class="scene__card-title">智能撰稿</div>
         <div class="scene__card-desc">基于大模型的新闻稿件自动生成，支持多种文体和风格</div>
       </div>
       <div class="scene__card">
-        <div class="scene__card-icon">🎯</div>
-        <div class="scene__card-title">选题推荐</div>
-        <div class="scene__card-desc">实时分析热点趋势，智能推荐最优选题方向</div>
+        <div class="scene__card-icon">🎬</div>
+        <div class="scene__card-title">多媒体生成</div>
+        <div class="scene__card-desc">文章自动转视频、AI 配图、信息图一键生成</div>
       </div>
       <div class="scene__card">
-        <div class="scene__card-icon">✅</div>
-        <div class="scene__card-title">质量审核</div>
-        <div class="scene__card-desc">多维度自动审核：事实核查、敏感词、排版规范</div>
+        <div class="scene__card-icon">🌐</div>
+        <div class="scene__card-title">多语言适配</div>
+        <div class="scene__card-desc">一键翻译多语种版本，保持语义准确与风格统一</div>
       </div>
     </div>
     <div class="scene__data">
@@ -98,24 +150,66 @@
       </div>
     </div>
   </section>
-  <section id="scene-purple" class="scene scene--purple">
+
+  <section id="review" class="scene scene--purple" aria-labelledby="review-title">
+    <div class="scene__divider"></div>
+    <div class="scene__label">
+      <div class="scene__icon">🛡️</div>
+      <span class="scene__label-text">审核校对</span>
+    </div>
+    <h2 id="review-title" class="scene__title">让 AI 成为你的<em>安全守门人</em></h2>
+    <p class="scene__desc">多维度自动审核，从事实核查到版权合规<br>大幅降低人为疏漏，守护媒体公信力</p>
+    <div class="scene__cards">
+      <div class="scene__card">
+        <div class="scene__card-icon">🔍</div>
+        <div class="scene__card-title">事实核查</div>
+        <div class="scene__card-desc">交叉比对多源信息，自动标记存疑内容和数据</div>
+      </div>
+      <div class="scene__card">
+        <div class="scene__card-icon">⚠️</div>
+        <div class="scene__card-title">敏感检测</div>
+        <div class="scene__card-desc">识别敏感信息、不当表述和潜在合规风险</div>
+      </div>
+      <div class="scene__card">
+        <div class="scene__card-icon">©️</div>
+        <div class="scene__card-title">版权合规</div>
+        <div class="scene__card-desc">自动检测图片、文字、音乐的版权风险</div>
+      </div>
+    </div>
+    <div class="scene__data">
+      <div class="scene__data-item">
+        <div class="scene__data-value">99.2%</div>
+        <div class="scene__data-label">事实核查覆盖率</div>
+      </div>
+      <div class="scene__data-item">
+        <div class="scene__data-value">0.3s</div>
+        <div class="scene__data-label">单篇审核耗时</div>
+      </div>
+      <div class="scene__data-item">
+        <div class="scene__data-value">80%</div>
+        <div class="scene__data-label">人工审核工作量减少</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="distribute" class="scene scene--gold" aria-labelledby="distribute-title">
     <div class="scene__divider"></div>
     <div class="scene__label">
       <div class="scene__icon">📡</div>
       <span class="scene__label-text">智能分发</span>
     </div>
-    <h2 class="scene__title">每个读者都是<em>唯一受众</em></h2>
-    <p class="scene__desc">AI驱动的个性化推荐引擎，让每一条内容精准触达目标读者<br>实现从"广而告之"到"精准投喂"的转变</p>
+    <h2 id="distribute-title" class="scene__title">每个读者都是<em>唯一受众</em></h2>
+    <p class="scene__desc">AI 驱动的个性化推荐引擎，让每一条内容精准触达目标读者<br>实现从"广而告之"到"精准投喂"的转变</p>
     <div class="scene__cards">
       <div class="scene__card">
         <div class="scene__card-icon">👤</div>
         <div class="scene__card-title">个性推荐</div>
-        <div class="scene__card-desc">基于用户画像的内容推荐，千人千面</div>
+        <div class="scene__card-desc">基于用户画像的内容推荐，千人千面，提升阅读体验</div>
       </div>
       <div class="scene__card">
         <div class="scene__card-icon">📱</div>
         <div class="scene__card-title">多渠道推送</div>
-        <div class="scene__card-desc">APP、微信、邮件、短信多渠道协同分发</div>
+        <div class="scene__card-desc">APP、微信、邮件、短信多渠道协同，最优时机触达</div>
       </div>
       <div class="scene__card">
         <div class="scene__card-icon">⚡</div>
@@ -138,69 +232,30 @@
       </div>
     </div>
   </section>
-  <section id="scene-gold" class="scene scene--gold">
-    <div class="scene__divider"></div>
-    <div class="scene__label">
-      <div class="scene__icon">🎬</div>
-      <span class="scene__label-text">多媒体处理</span>
-    </div>
-    <h2 class="scene__title">文字、图片、视频<em>一键生成</em></h2>
-    <p class="scene__desc">从文字稿件自动生成配图、短视频、信息图<br>AI让多媒体内容生产不再依赖专业团队</p>
-    <div class="scene__cards">
-      <div class="scene__card">
-        <div class="scene__card-icon">🎥</div>
-        <div class="scene__card-title">AI剪辑</div>
-        <div class="scene__card-desc">智能识别精彩片段，自动剪辑生成短视频</div>
-      </div>
-      <div class="scene__card">
-        <div class="scene__card-icon">🏷️</div>
-        <div class="scene__card-title">智能标注</div>
-        <div class="scene__card-desc">自动识别画面内容，生成标签和描述文字</div>
-      </div>
-      <div class="scene__card">
-        <div class="scene__card-icon">🔄</div>
-        <div class="scene__card-title">跨媒体转换</div>
-        <div class="scene__card-desc">文章转视频、视频转图文，一键跨格式转换</div>
-      </div>
-    </div>
-    <div class="scene__data">
-      <div class="scene__data-item">
-        <div class="scene__data-value">5min</div>
-        <div class="scene__data-label">视频生成</div>
-      </div>
-      <div class="scene__data-item">
-        <div class="scene__data-value">10×</div>
-        <div class="scene__data-label">处理效率</div>
-      </div>
-      <div class="scene__data-item">
-        <div class="scene__data-value">100+</div>
-        <div class="scene__data-label">格式支持</div>
-      </div>
-    </div>
-  </section>
-  <section id="scene-green" class="scene scene--green">
+
+  <section id="insight" class="scene scene--green" aria-labelledby="insight-title">
     <div class="scene__divider"></div>
     <div class="scene__label">
       <div class="scene__icon">📊</div>
       <span class="scene__label-text">数据洞察</span>
     </div>
-    <h2 class="scene__title">用数据驱动每一个<em>决策</em></h2>
+    <h2 id="insight-title" class="scene__title">用数据驱动每一个<em>决策</em></h2>
     <p class="scene__desc">从舆情监测到用户行为分析，从效果归因到趋势预测<br>让数据成为媒体运营的核心引擎</p>
     <div class="scene__cards">
       <div class="scene__card">
-        <div class="scene__card-icon">🔍</div>
+        <div class="scene__card-icon">🌊</div>
         <div class="scene__card-title">舆情监测</div>
-        <div class="scene__card-desc">实时追踪全网舆情动态，及时预警热点事件</div>
+        <div class="scene__card-desc">实时追踪全网舆情动态，及时预警热点事件和危机信号</div>
       </div>
       <div class="scene__card">
-        <div class="scene__card-icon">📈</div>
+        <div class="scene__card-icon">🔎</div>
         <div class="scene__card-title">行为分析</div>
-        <div class="scene__card-desc">深度分析用户阅读行为，洞察内容消费偏好</div>
+        <div class="scene__card-desc">深度分析用户阅读行为，洞察内容消费偏好与习惯</div>
       </div>
       <div class="scene__card">
         <div class="scene__card-icon">🎯</div>
         <div class="scene__card-title">效果归因</div>
-        <div class="scene__card-desc">精准归因每篇内容的传播效果，指导运营策略</div>
+        <div class="scene__card-desc">精准归因每篇内容的传播效果，指导运营策略优化</div>
       </div>
     </div>
     <div class="scene__data">
@@ -218,17 +273,59 @@
       </div>
     </div>
   </section>
+
+  <section id="future" class="scene scene--pink" aria-labelledby="future-title">
+    <div class="scene__divider"></div>
+    <div class="scene__label">
+      <div class="scene__icon">🚀</div>
+      <span class="scene__label-text">未来展望</span>
+    </div>
+    <h2 id="future-title" class="scene__title">人机协作的<em>新范式</em></h2>
+    <p class="scene__desc">AI 不会取代媒体人，但会用 AI 的媒体人将取代不会用 AI 的媒体人<br>探索未来的工作方式与行业生态</p>
+    <div class="scene__cards">
+      <div class="scene__card">
+        <div class="scene__card-icon">🤝</div>
+        <div class="scene__card-title">人机协作</div>
+        <div class="scene__card-desc">记者专注调查与判断，AI 处理信息与呈现，各尽所长</div>
+      </div>
+      <div class="scene__card">
+        <div class="scene__card-icon">🎓</div>
+        <div class="scene__card-title">技能进化</div>
+        <div class="scene__card-desc">提示工程、AI 工具链管理成为媒体人的核心技能</div>
+      </div>
+      <div class="scene__card">
+        <div class="scene__card-icon">🌏</div>
+        <div class="scene__card-title">生态重构</div>
+        <div class="scene__card-desc">新型内容形态涌现，媒体边界模糊，行业格局重塑</div>
+      </div>
+    </div>
+    <div class="scene__data">
+      <div class="scene__data-item">
+        <div class="scene__data-value">2030</div>
+        <div class="scene__data-label">全面智能化预期</div>
+      </div>
+      <div class="scene__data-item">
+        <div class="scene__data-value">70%</div>
+        <div class="scene__data-label">流程将被 AI 辅助</div>
+      </div>
+      <div class="scene__data-item">
+        <div class="scene__data-value">∞</div>
+        <div class="scene__data-label">想象空间</div>
+      </div>
+    </div>
+  </section>
+
   <section id="cta" class="cta-section">
     <div class="cta-section__grid-bg"></div>
     <div class="cta-section__content">
       <div class="cta-section__divider"></div>
       <h2 class="cta-section__title">
-        准备好拥抱<span class="cta-section__title-gradient">AI驱动的媒体未来</span>了吗？
+        准备好探索<span class="cta-section__title-gradient">AI 驱动的媒体未来</span>了吗？
       </h2>
-      <p class="cta-section__subtitle">加入数百家媒体机构的行列，开启您的AI转型之旅</p>
+      <p class="cta-section__subtitle">与行业先行者一起，探索技术变革的无限可能</p>
       <div class="cta-section__buttons">
-        <a href="#" class="btn btn--primary">开始免费体验</a>
-        <a href="#" class="btn btn--outline">预约演示</a>
+        <a href="#" class="btn btn--primary">预约技术交流</a>
+        <a href="#" class="btn btn--outline">下载完整观察报告</a>
       </div>
     </div>
   </section>
@@ -237,7 +334,7 @@
     <div class="footer__inner">
       <div class="navbar__logo">
         <div class="navbar__logo-icon">A</div>
-        <span class="navbar__logo-text">AI × 媒体未来</span>
+        <span class="navbar__logo-text">AI × 传媒变革</span>
       </div>
       <div class="footer__links">
         <a href="#">首页</a>
@@ -245,8 +342,9 @@
         <a href="#">联系方式</a>
         <a href="#">隐私政策</a>
       </div>
-      <div class="footer__copyright">© 2026 AI × 媒体未来. All rights reserved.</div>
+      <div class="footer__copyright">© 2026 AI × 传媒变革. 技术引领，探索未来.</div>
     </div>
   </footer>
+  <script src="scripts.js"></script>
 </body>
 </html>
