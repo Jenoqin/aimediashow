@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI多媒体生成工作流演示系统——文字转视频、AI配图、信息图生成">
+  <title>多媒体生成 | AI × 传媒变革</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .detail-hero {
+      min-height: 40vh; padding-top: 5rem;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--theme-color) 8%, transparent) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 70%, rgba(124, 58, 237, 0.06) 0%, transparent 50%);
+    }
+    .config-section {
+      max-width: min(90vw, 56rem);
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    .config-header { text-align: center; margin-bottom: 2rem; }
+    .config-header h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem; }
+    .config-header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+    .config-form {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 2rem;
+    }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group__label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .form-group__hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .content-input {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 0.9375rem;
+      font-family: inherit;
+      line-height: 1.7;
+      min-height: 140px;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+    .content-input:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+    .content-input::placeholder { color: var(--text-dim); }
+
+    .preset-selector {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    .preset-chip {
+      padding: 0.375rem 0.875rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .preset-chip:hover { border-color: rgba(0,212,255,0.3); color: var(--cyan); }
+    .preset-chip.active {
+      background: var(--cyan);
+      color: var(--bg);
+      border-color: var(--cyan);
+    }
+
+    .type-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 768px) { .type-options { grid-template-columns: repeat(2, 1fr); } }
+    .type-option {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .type-option:hover { border-color: rgba(0,212,255,0.3); }
+    .type-option.active {
+      border-color: var(--cyan);
+      background: rgba(0,212,255,0.08);
+    }
+    .type-option__icon { font-size: 1.5rem; margin-bottom: 0.375rem; }
+    .type-option__name { font-size: 0.8125rem; font-weight: 600; }
+
+    .output-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 768px) { .output-options { grid-template-columns: repeat(2, 1fr); } }
+    .output-option {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .output-option:hover { border-color: rgba(0,212,255,0.3); }
+    .output-option.active {
+      border-color: var(--cyan);
+      background: rgba(0,212,255,0.08);
+    }
+    .output-option__icon { font-size: 1.5rem; margin-bottom: 0.375rem; }
+    .output-option__name { font-size: 0.8125rem; font-weight: 600; }
+    .output-option__badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 0.625rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      display: none;
+    }
+    .output-option.active .output-option__badge { display: flex; }
+
+    .style-options {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .style-option {
+      padding: 0.5rem 1.25rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .style-option:hover { border-color: var(--cyan); color: var(--cyan); }
+    .style-option.active {
+      background: var(--cyan);
+      color: var(--bg);
+      border-color: var(--cyan);
+    }
+
+    .generate-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: none;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .generate-btn:hover {
+      box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .workflow-section {
+      max-width: min(90vw, 56rem);
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+    .workflow-placeholder {
+      background: var(--bg-card);
+      border: 2px dashed rgba(255,255,255,0.08);
+      border-radius: 1rem;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .workflow-content {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .workflow-steps {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .wf-step {
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      padding: 0.75rem 0.375rem;
+      border-radius: 0.75rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s;
+    }
+    .wf-step.active {
+      border-color: var(--cyan);
+      background: rgba(0, 212, 255, 0.08);
+    }
+    .wf-step.completed {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .wf-step__num {
+      width: 1.625rem; height: 1.625rem;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6875rem; font-weight: 700;
+      margin: 0 auto 0.375rem;
+    }
+    .wf-step.active .wf-step__num {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+    .wf-step.completed .wf-step__num {
+      background: var(--green);
+      color: #fff;
+    }
+    .wf-step__title { font-size: 0.6875rem; font-weight: 600; }
+    .wf-step__status { font-size: 0.625rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .step-work-area {
+      min-height: 320px;
+    }
+
+    .progress-bar-inline {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .progress-bar-inline__fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), #0099cc);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    /* 步骤1：内容导入 */
+    .content-preview {
+      background: rgba(0,0,0,0.2);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .content-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 768px) { .content-stats { grid-template-columns: repeat(2, 1fr); } }
+    .content-stat {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 0.5rem;
+    }
+    .content-stat__value {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .content-stat__label {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* 步骤2：智能分析 */
+    .analysis-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .analysis-cards { grid-template-columns: 1fr; } }
+    .analysis-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      opacity: 0;
+      transform: translateY(15px);
+      animation: cardIn 0.5s ease forwards;
+    }
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .analysis-card__icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .analysis-card__title { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .analysis-card__content { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; }
+    .analysis-card__tag {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      background: rgba(0,212,255,0.1);
+      color: var(--cyan);
+      font-size: 0.6875rem;
+      margin: 0.25rem 0.25rem 0 0;
+    }
+
+    /* 步骤3：素材匹配 */
+    .storyboard {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .scene-card {
+      flex: 0 0 180px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: sceneIn 0.4s ease forwards;
+    }
+    @keyframes sceneIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+    .scene-card__visual {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .scene-card__label {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .scene-card__text {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .scene-card__time {
+      font-size: 0.625rem;
+      color: var(--orange);
+      margin-top: 0.375rem;
+    }
+
+    .material-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 768px) { .material-grid { grid-template-columns: repeat(2, 1fr); } }
+    .material-grid__item {
+      aspect-ratio: 16/10;
+      background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08));
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    .material-grid__item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(0,212,255,0.15), transparent 70%);
+    }
+    .material-grid__icon { font-size: 2rem; position: relative; z-index: 1; }
+    .material-grid__label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      position: relative;
+      z-index: 1;
+    }
+    .material-grid__status {
+      position: absolute;
+      top: 0.5rem; right: 0.5rem;
+      font-size: 0.625rem;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      background: rgba(16,185,129,0.2);
+      color: var(--green);
+      z-index: 1;
+    }
+
+    /* 步骤4：多媒体合成 */
+    .compose-panel {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .compose-panel__header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .compose-progress {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    .compose-progress__fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), #7c3aed);
+      border-radius: 4px;
+      transition: width 0.8s ease;
+      width: 0%;
+    }
+    .compose-log {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-family: monospace;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .compose-log__item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .compose-log__time { color: var(--text-dim); flex-shrink: 0; }
+    .compose-log__text { color: var(--text-secondary); }
+
+    /* 步骤5：成品输出 */
+    .output-showcase {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) { .output-showcase { grid-template-columns: 1fr; } }
+
+    .video-player {
+      background: rgba(0,0,0,0.3);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .video-player__screen {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+      position: relative;
+    }
+    .video-player__play {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .video-player__play:hover {
+      background: rgba(255,255,255,0.25);
+      transform: scale(1.05);
+    }
+    .video-player__title {
+      position: absolute;
+      bottom: 0.75rem; left: 0.75rem; right: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+    .video-player__controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(0,0,0,0.4);
+    }
+    .video-player__progress {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .video-player__progress-bar {
+      width: 100%;
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 2px;
+      animation: videoProgress 60s linear;
+    }
+    @keyframes videoProgress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+    .video-player__time {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .output-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .output-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .output-card:hover {
+      border-color: rgba(0,212,255,0.2);
+      transform: translateY(-2px);
+    }
+    .output-card__icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .output-card__title { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .output-card__meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .output-card__btn {
+      display: inline-block;
+      padding: 0.375rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.3);
+      color: var(--cyan);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .output-card:hover .output-card__btn {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+
+    .infographic-preview {
+      background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.05));
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      text-align: center;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .infographic-preview__icon { font-size: 3rem; }
+    .infographic-preview__title { font-size: 1rem; font-weight: 600; }
+    .infographic-preview__desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; }
+  </style>
+</head>
+<body style="--theme-color: var(--cyan);">
+  <nav class="navbar">
+    <div class="navbar__logo">
+      <div class="navbar__logo-icon">A</div>
+      <span class="navbar__logo-text">AI × 传媒变革</span>
+    </div>
+    <div class="navbar__links">
+      <a href="index.html" class="navbar__link">首页</a>
+      <a href="index.html#topic" class="navbar__link">选题策划</a>
+      <a href="index.html#produce" class="navbar__link navbar__link--active">内容生产</a>
+      <a href="index.html#review" class="navbar__link">审核校对</a>
+      <a href="index.html#distribute" class="navbar__link">智能分发</a>
+      <a href="index.html#insight" class="navbar__link">数据洞察</a>
+      <a href="index.html#future" class="navbar__link">未来展望</a>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="hero__grid-bg"></div>
+    <div class="hero__content">
+      <div class="hero__badge">🎬 多媒体生成</div>
+      <h1 class="hero__title">让 AI 成为你的<span style="color: var(--cyan)">多媒体工作室</span></h1>
+      <p class="hero__subtitle">输入文字内容，AI 自动完成视频生成、AI配图、信息图设计<br>一次生产，多次利用，多形态分发</p>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <div class="config-header">
+      <h2>🎬 创作配置</h2>
+      <p>选择预设内容或粘贴文字，AI 将为您生成多媒体素材</p>
+    </div>
+    <div class="config-form">
+      <div class="form-group">
+        <label class="form-group__label">快速选择预设内容</label>
+        <div class="preset-selector" id="presetSelector">
+          <div class="preset-chip" data-preset="news">📰 亚运会数字人点火新闻</div>
+          <div class="preset-chip active" data-preset="review">📱 iPhone 16 深度评测</div>
+          <div class="preset-chip" data-preset="tutorial">🤖 AI写作入门教程</div>
+          <div class="preset-chip" data-preset="brand">☕ 品牌故事短片</div>
+        </div>
+        <textarea class="content-input" id="contentInput" placeholder="粘贴文章正文，或选择上方预设内容..."></textarea>
+        <div class="form-group__hint">支持 500-5000 字的文章内容，AI 将自动提取关键信息生成多媒体</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-group__label">内容类型</label>
+        <div class="type-options" id="typeOptions">
+          <div class="type-option active" data-type="news">
+            <div class="type-option__icon">📰</div>
+            <div class="type-option__name">新闻报道</div>
+          </div>
+          <div class="type-option" data-type="review">
+            <div class="type-option__icon">⭐</div>
+            <div class="type-option__name">产品评测</div>
+          </div>
+          <div class="type-option" data-type="tutorial">
+            <div class="type-option__icon">📚</div>
+            <div class="type-option__name">教程讲解</div>
+          </div>
+          <div class="type-option" data-type="brand">
+            <div class="type-option__icon">🎬</div>
+            <div class="type-option__name">品牌故事</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-group__label">输出形式（可多选）</label>
+        <div class="output-options" id="outputOptions">
+          <div class="output-option active" data-output="video">
+            <div class="output-option__badge">✓</div>
+            <div class="output-option__icon">🎬</div>
+            <div class="output-option__name">短视频</div>
+          </div>
+          <div class="output-option" data-output="longvideo">
+            <div class="output-option__badge">✓</div>
+            <div class="output-option__icon">🎞️</div>
+            <div class="output-option__name">长视频</div>
+          </div>
+          <div class="output-option active" data-output="infographic">
+            <div class="output-option__badge">✓</div>
+            <div class="output-option__icon">📊</div>
+            <div class="output-option__name">信息图</div>
+          </div>
+          <div class="output-option active" data-output="poster">
+            <div class="output-option__badge">✓</div>
+            <div class="output-option__icon">🖼️</div>
+            <div class="output-option__name">封面图</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-group__label">视觉风格</label>
+        <div class="style-options" id="styleOptions">
+          <div class="style-option active" data-style="tech">科技感</div>
+          <div class="style-option" data-style="warm">温暖人文</div>
+          <div class="style-option" data-style="minimal">极简现代</div>
+          <div class="style-option" data-style="vibrant">活力缤纷</div>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="generateBtn">🎬 开始多媒体生成</button>
+    </div>
+  </section>
+
+  <section class="workflow-section">
+    <div class="workflow-placeholder" id="workflowPlaceholder">
+      👆 配置内容后点击"开始多媒体生成"，查看 AI 多媒体创作完整工作流
+    </div>
+    <div class="workflow-content" id="workflowContent" style="display:none;">
+      <div class="workflow-steps" id="workflowSteps">
+        <div class="wf-step active" data-step="0">
+          <div class="wf-step__num">1</div>
+          <div class="wf-step__title">内容导入</div>
+          <div class="wf-step__status" id="status0">进行中...</div>
+        </div>
+        <div class="wf-step" data-step="1">
+          <div class="wf-step__num">2</div>
+          <div class="wf-step__title">智能分析</div>
+          <div class="wf-step__status" id="status1">等待</div>
+        </div>
+        <div class="wf-step" data-step="2">
+          <div class="wf-step__num">3</div>
+          <div class="wf-step__title">素材匹配</div>
+          <div class="wf-step__status" id="status2">等待</div>
+        </div>
+        <div class="wf-step" data-step="3">
+          <div class="wf-step__num">4</div>
+          <div class="wf-step__title">多媒体合成</div>
+          <div class="wf-step__status" id="status3">等待</div>
+        </div>
+        <div class="wf-step" data-step="4">
+          <div class="wf-step__num">5</div>
+          <div class="wf-step__title">成品输出</div>
+          <div class="wf-step__status" id="status4">等待</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-inline">
+        <div class="progress-bar-inline__fill" id="overallProgress" style="width:0%"></div>
+      </div>
+
+      <div class="step-work-area" id="stepWorkArea">
+        <!-- 动态内容 -->
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="navbar__logo">
+        <div class="navbar__logo-icon">A</div>
+        <span class="navbar__logo-text">AI × 传媒变革</span>
+      </div>
+      <div class="footer__links">
+        <a href="index.html">首页</a>
+        <a href="#">关于我们</a>
+        <a href="#">联系方式</a>
+      </div>
+      <div class="footer__copyright">© 2026 AI × 传媒变革. 技术引领，探索未来.</div>
+    </div>
+  </footer>
+
+  <script>
+    // ====== 预设内容数据 ======
+    const presetDB = {
+      news: {
+        title: '杭州亚运会数字人点火新闻',
+        text: '杭州亚运会开幕式于9月23日晚在杭州奥体中心体育场盛大举行。本届开幕式以"潮起亚细亚"为主题，将千年杭城的诗意韵味与亚运精神的蓬勃朝气巧妙融合，为全球观众奉献了一场科技与人文交相辉映的视觉盛宴。\n\n整场开幕式最令人瞩目的，当属数字人"弄潮儿"点燃主火炬的历史性时刻。这位依托前沿AI技术打造的虚拟形象，手持亚运火炬凌空跨越波澜壮阔的钱塘江，最终在主体育场内精准点燃了圣火。这一开创性的设计不仅是亚运百年史上的首次尝试，更象征着大型综合性体育赛事正式迈入数字文明与实体经济深度融合的新纪元。\n\n社交媒体上，#数字人点火#词条在短时间内登顶微博热搜榜首，全网阅读量强势突破10亿大关。',
+        type: 'news'
+      },
+      review: {
+        title: 'iPhone 16 深度评测',
+        text: '作为苹果年度旗舰，iPhone 16 系列在芯片、影像、交互三个维度都带来了显著升级。首先来看最核心的 A18 芯片，采用台积电第二代 3nm 工艺，晶体管数量达到 190 亿，CPU 性能提升约 15%，GPU 提升约 20%。\n\n影像系统方面，iPhone 16 Pro 首次搭载了 4800 万像素超广角镜头，配合升级后的计算摄影算法，在夜景和微距场景下表现尤为出色。新增的"空间视频"录制功能，为 Vision Pro 生态做好了内容储备。\n\n交互体验上，全新的"相机控制"按键是本次最具创新性的设计。这枚电容式按键支持轻按对焦、重按拍摄、滑动变焦等操作，让单手握持时的拍摄体验大幅提升。续航方面，在 A18 芯片能效优化的加持下，Pro Max 版本实现了约 2 小时的视频播放时长提升。',
+        type: 'review'
+      },
+      tutorial: {
+        title: 'AI写作入门教程',
+        text: '欢迎来到 AI 写作入门课程。在本教程中，你将学习如何利用大语言模型提升内容生产效率，同时保持内容质量和原创性。\n\n第一步：明确写作目标。在使用 AI 之前，你需要清晰定义文章的主题、目标受众和核心观点。这是决定 AI 输出质量的关键。\n\n第二步：构建提示词框架。一个好的提示词包含背景信息、角色设定、任务描述和输出格式四个要素。例如："你是一位资深的科技评论员，请为 25-40 岁的都市读者撰写一篇关于 AI 手机评测的文章，要求客观中立，800字左右。"\n\n第三步：迭代优化。AI 的初稿往往需要人工修改。重点关注事实准确性、逻辑连贯性和品牌调性一致性。建议将 AI 作为"第一稿生成器"，而非最终稿件。',
+        type: 'tutorial'
+      },
+      brand: {
+        title: '品牌故事：一杯咖啡的诞生',
+        text: '2019 年春天，三位来自不同行业的创业者在上海弄堂里的一家小咖啡馆相遇。他们都热爱咖啡，也都不满足于市场上千篇一律的连锁品牌。于是，一个大胆的想法诞生了——做一家真正"懂中国人口味"的精品咖啡品牌。\n\n经过三年的探索，团队走访了云南、海南等国内主要咖啡产区，与 20 多位咖农建立了直接合作关系。他们坚持"从种子到杯子"的全链路可追溯，每一颗咖啡豆都承载着产地风土与咖农心血。\n\n如今，这个起源于弄堂的品牌已在全国开设了 50 多家门店，但创始人始终坚持一个理念：咖啡不仅是饮品，更是连接人与人、人与土地的媒介。每一杯咖啡，都是一段关于热爱与坚持的故事。',
+        type: 'brand'
+      }
+    };
+
+    // ====== 多媒体生成数据 ======
+    const mediaDB = {
+      news: {
+        analysis: {
+          keyPoints: ['开幕式数字人点火', 'AI技术应用突破', '社交媒体热议', '亚运历史首次'],
+          sentiment: '积极振奋',
+          keywords: ['数字人', '亚运会', 'AI技术', '点火仪式', '杭州'],
+          duration: '2分30秒'
+        },
+        storyboard: [
+          { scene: '开场', content: '杭州夜景航拍，奥体中心全景', visualType: '视频', visualDesc: '🌃 航拍夜景', duration: '15s' },
+          { scene: '引入', content: '开幕式现场画面，观众欢呼', visualType: '视频', visualDesc: '🎆 开幕式现场', duration: '20s' },
+          { scene: '高潮', content: '数字人跨越钱塘江点火特写', visualType: '特效', visualDesc: '🔥 数字人点火', duration: '30s' },
+          { scene: '解读', content: 'AI技术原理可视化演示', visualType: '动画', visualDesc: '🤖 技术解析', duration: '25s' },
+          { scene: '反响', content: '社交媒体数据与网友评论', visualType: '图文', visualDesc: '📱 社媒反响', duration: '20s' },
+          { scene: '结尾', content: '亚运会主题画面，展望未来', visualType: '视频', visualDesc: '🏅 亚运精神', duration: '20s' }
+        ],
+        materials: [
+          { icon: '🎬', label: '开幕式航拍素材', status: '已匹配' },
+          { icon: '🎨', label: '数字人3D模型', status: 'AI生成' },
+          { icon: '📊', label: '社交媒体数据图', status: 'AI生成' },
+          { icon: '🎵', label: '背景音乐《潮起》', status: '已匹配' },
+          { icon: '✂️', label: '转场特效包', status: '已匹配' },
+          { icon: '📝', label: '字幕文件', status: 'AI生成' }
+        ],
+        compose: {
+          video: { name: '短视频版本', progress: 100, logs: ['提取关键帧...', '匹配素材库...', '生成配音旁白...', '合成字幕...', '添加转场特效...', '导出 1080P 视频'] },
+          infographic: { name: '信息图版本', progress: 100, logs: ['提取数据要点...', '设计版式布局...', '生成数据可视化...', '导出 PNG / PDF'] },
+          poster: { name: '封面图版本', progress: 100, logs: ['分析视觉风格...', '生成主视觉...', '添加标题文字...', '导出多种尺寸'] }
+        },
+        outputs: {
+          video: { duration: '2:30', resolution: '1080P', size: '156MB', format: 'MP4' },
+          infographic: { size: '2.4MB', format: 'PNG + PDF', dimensions: '1080×1920' },
+          poster: { size: '1.8MB', format: 'PNG', dimensions: '1200×630' }
+        }
+      },
+      review: {
+        analysis: {
+          keyPoints: ['A18芯片性能升级', '4800万超广角镜头', '相机控制按键创新', '续航提升2小时'],
+          sentiment: '专业客观',
+          keywords: ['iPhone 16', 'A18芯片', '评测', '影像', '续航'],
+          duration: '4分15秒'
+        },
+        storyboard: [
+          { scene: '开场', content: 'iPhone 16 产品外观展示', visualType: '视频', visualDesc: '📱 产品外观', duration: '20s' },
+          { scene: '芯片', content: 'A18芯片性能跑分对比', visualType: '动画', visualDesc: '⚡ 性能测试', duration: '45s' },
+          { scene: '影像', content: '样张对比与细节放大', visualType: '图文', visualDesc: '📸 影像对比', duration: '50s' },
+          { scene: '交互', content: '相机控制按键操作演示', visualType: '视频', visualDesc: '🎮 交互体验', duration: '40s' },
+          { scene: '续航', content: '续航测试数据可视化', visualType: '图表', visualDesc: '🔋 续航测试', duration: '30s' },
+          { scene: '总结', content: '购买建议与适用人群', visualType: '图文', visualDesc: '💡 购买建议', duration: '30s' }
+        ],
+        materials: [
+          { icon: '📱', label: '产品渲染图', status: '已匹配' },
+          { icon: '📸', label: '实拍样张', status: '已匹配' },
+          { icon: '📊', label: '跑分数据图表', status: 'AI生成' },
+          { icon: '🎵', label: '科技风BGM', status: '已匹配' },
+          { icon: '🔤', label: '参数对比表', status: 'AI生成' },
+          { icon: '📝', label: '配音脚本', status: 'AI生成' }
+        ],
+        compose: {
+          video: { name: '评测视频版本', progress: 100, logs: ['提取评测要点...', '匹配产品素材...', '生成专业旁白...', '合成参数图表...', '添加对比动画...', '导出 4K 视频'] },
+          infographic: { name: '参数对比图', progress: 100, logs: ['提取核心参数...', '设计对比版式...', '生成可视化图表...', '导出高清图片'] },
+          poster: { name: '评测封面图', progress: 100, logs: ['分析视觉风格...', '生成产品主视觉...', '添加评测标题...', '导出封面尺寸'] }
+        },
+        outputs: {
+          video: { duration: '4:15', resolution: '4K', size: '420MB', format: 'MP4' },
+          infographic: { size: '3.1MB', format: 'PNG + PDF', dimensions: '1080×2400' },
+          poster: { size: '2.2MB', format: 'PNG', dimensions: '1200×630' }
+        }
+      },
+      tutorial: {
+        analysis: {
+          keyPoints: ['明确写作目标', '构建提示词框架', '迭代优化方法', 'AI辅助写作原则'],
+          sentiment: '友好引导',
+          keywords: ['AI写作', '教程', '提示词', '效率提升', '内容生产'],
+          duration: '3分45秒'
+        },
+        storyboard: [
+          { scene: '开场', content: '课程主题与学习目标', visualType: '图文', visualDesc: '📚 课程介绍', duration: '20s' },
+          { scene: '步骤1', content: '如何明确写作目标', visualType: '动画', visualDesc: '🎯 明确目标', duration: '45s' },
+          { scene: '步骤2', content: '提示词框架四要素', visualType: '图文', visualDesc: '📝 提示词框架', duration: '50s' },
+          { scene: '步骤3', content: '迭代优化实操演示', visualType: '录屏', visualDesc: '💻 实操演示', duration: '60s' },
+          { scene: '案例', content: '优秀案例展示', visualType: '图文', visualDesc: '🌟 案例展示', duration: '30s' },
+          { scene: '结尾', content: '总结与进阶建议', visualType: '图文', visualDesc: '🎓 课程总结', duration: '20s' }
+        ],
+        materials: [
+          { icon: '📚', label: '课程框架图', status: 'AI生成' },
+          { icon: '💻', label: '界面录屏素材', status: '已匹配' },
+          { icon: '📝', label: '提示词模板', status: 'AI生成' },
+          { icon: '🎵', label: '轻音乐BGM', status: '已匹配' },
+          { icon: '📊', label: '流程示意图', status: 'AI生成' },
+          { icon: '🎤', label: '讲解配音', status: 'AI生成' }
+        ],
+        compose: {
+          video: { name: '教程视频版本', progress: 100, logs: ['提取教程步骤...', '匹配录屏素材...', '生成讲解配音...', '合成流程动画...', '添加标注高亮...', '导出 1080P 视频'] },
+          infographic: { name: '知识卡片', progress: 100, logs: ['提取知识点...', '设计卡片版式...', '生成示意图...', '导出系列图片'] },
+          poster: { name: '课程封面', progress: 100, logs: ['分析课程风格...', '生成封面视觉...', '添加课程标题...', '导出封面尺寸'] }
+        },
+        outputs: {
+          video: { duration: '3:45', resolution: '1080P', size: '280MB', format: 'MP4' },
+          infographic: { size: '1.8MB', format: 'PNG', dimensions: '1080×1920' },
+          poster: { size: '1.5MB', format: 'PNG', dimensions: '1200×630' }
+        }
+      },
+      brand: {
+        analysis: {
+          keyPoints: ['创业者相遇故事', '产地探访历程', '品牌理念坚持', '50家门店成长'],
+          sentiment: '温暖感人',
+          keywords: ['品牌故事', '咖啡', '创业', '云南', '匠心'],
+          duration: '2分50秒'
+        },
+        storyboard: [
+          { scene: '开场', content: '上海弄堂老咖啡馆', visualType: '视频', visualDesc: '☕ 弄堂咖啡', duration: '20s' },
+          { scene: '相遇', content: '三位创始人相遇故事', visualType: '视频', visualDesc: '🤝 创业相遇', duration: '30s' },
+          { scene: '探访', content: '云南咖啡产地实拍', visualType: '视频', visualDesc: '🌱 产地探访', duration: '45s' },
+          { scene: '匠心', content: '烘焙与冲泡过程', visualType: '视频', visualDesc: '🔥 烘焙匠心', duration: '35s' },
+          { scene: '成长', content: '门店与用户故事', visualType: '图文', visualDesc: '🏪 品牌成长', duration: '25s' },
+          { scene: '结尾', content: '品牌理念与愿景', visualType: '视频', visualDesc: '💫 品牌愿景', duration: '15s' }
+        ],
+        materials: [
+          { icon: '📷', label: '弄堂实拍素材', status: '已匹配' },
+          { icon: '🌄', label: '云南产地照片', status: '已匹配' },
+          { icon: '☕', label: '咖啡制作过程', status: '已匹配' },
+          { icon: '🎵', label: '温暖民谣BGM', status: '已匹配' },
+          { icon: '🎨', label: '品牌视觉元素', status: 'AI生成' },
+          { icon: '📝', label: '旁白文案', status: 'AI生成' }
+        ],
+        compose: {
+          video: { name: '品牌故事短片', progress: 100, logs: ['提取故事脉络...', '匹配情感素材...', '生成温暖旁白...', '合成品牌视觉...', '添加情感音乐...', '导出 1080P 视频'] },
+          infographic: { name: '品牌历程图', progress: 100, logs: ['提取品牌里程碑...', '设计时间轴版式...', '生成视觉元素...', '导出品牌手册'] },
+          poster: { name: '品牌海报', progress: 100, logs: ['分析品牌调性...', '生成主视觉...', '添加品牌标语...', '导出多种尺寸'] }
+        },
+        outputs: {
+          video: { duration: '2:50', resolution: '1080P', size: '198MB', format: 'MP4' },
+          infographic: { size: '2.6MB', format: 'PNG + PDF', dimensions: '1080×2400' },
+          poster: { size: '2.0MB', format: 'PNG', dimensions: '1080×1080' }
+        }
+      }
+    };
+
+    // ====== 状态 ======
+    let selectedPreset = 'review';
+    let selectedType = 'review';
+    let selectedStyle = 'tech';
+    let selectedOutputs = new Set(['video', 'infographic', 'poster']);
+    let currentStep = -1;
+    let isRunning = false;
+
+    // ====== DOM ======
+    const presetChips = document.querySelectorAll('.preset-chip');
+    const contentInput = document.getElementById('contentInput');
+    const typeOptions = document.querySelectorAll('.type-option');
+    const outputOptions = document.querySelectorAll('.output-option');
+    const styleOptions = document.querySelectorAll('.style-option');
+    const generateBtn = document.getElementById('generateBtn');
+    const placeholderEl = document.getElementById('workflowPlaceholder');
+    const contentEl = document.getElementById('workflowContent');
+    const workArea = document.getElementById('stepWorkArea');
+    const progressEl = document.getElementById('overallProgress');
+
+    // 初始化预设内容
+    contentInput.value = presetDB[selectedPreset].text;
+
+    // ====== 预设选择 ======
+    presetChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        presetChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedPreset = chip.dataset.preset;
+        contentInput.value = presetDB[selectedPreset].text;
+        // 同步更新内容类型
+        const presetType = presetDB[selectedPreset].type;
+        typeOptions.forEach(t => {
+          t.classList.toggle('active', t.dataset.type === presetType);
+        });
+        selectedType = presetType;
+      });
+    });
+
+    // ====== 内容类型选择 ======
+    typeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        typeOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedType = opt.dataset.type;
+      });
+    });
+
+    // ====== 输出形式选择 ======
+    outputOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const key = opt.dataset.output;
+        if (selectedOutputs.has(key)) {
+          if (selectedOutputs.size > 1) {
+            selectedOutputs.delete(key);
+            opt.classList.remove('active');
+          }
+        } else {
+          selectedOutputs.add(key);
+          opt.classList.add('active');
+        }
+      });
+    });
+
+    // ====== 风格选择 ======
+    styleOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        styleOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedStyle = opt.dataset.style;
+      });
+    });
+
+    // ====== 开始生成 ======
+    generateBtn.addEventListener('click', () => {
+      if (isRunning) return;
+      const content = contentInput.value.trim();
+      if (!content || content.length < 20) {
+        contentInput.style.borderColor = '#ef4444';
+        setTimeout(() => contentInput.style.borderColor = '', 1000);
+        return;
+      }
+      startWorkflow();
+    });
+
+    function startWorkflow() {
+      isRunning = true;
+      generateBtn.disabled = true;
+      generateBtn.textContent = '⏳ 多媒体生成中...';
+      placeholderEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      currentStep = 0;
+      updateStepVisuals();
+      runStep0();
+    }
+
+    function updateStepVisuals() {
+      document.querySelectorAll('.wf-step').forEach((s, i) => {
+        s.classList.remove('active', 'completed');
+        if (i < currentStep) s.classList.add('completed');
+        else if (i === currentStep) s.classList.add('active');
+      });
+      const pct = ((currentStep + 1) / 5) * 100;
+      progressEl.style.width = pct + '%';
+    }
+
+    function setStatus(step, text) {
+      document.getElementById('status' + step).textContent = text;
+    }
+
+    function getMediaData() {
+      return mediaDB[selectedType] || mediaDB.news;
+    }
+
+    // ====== 步骤0：内容导入 ======
+    function runStep0() {
+      currentStep = 0;
+      updateStepVisuals();
+      setStatus(0, '解析中...');
+      const content = contentInput.value.trim();
+      const wordCount = content.length;
+      const paraCount = content.split('\n').filter(p => p.trim()).length;
+
+      workArea.innerHTML = `
+        <div style="margin-bottom:0.75rem;color:var(--cyan);font-size:0.875rem;font-weight:600;"
+          >📥 正在解析内容结构...</div>
+        <div class="content-preview" id="contentPreview" style="opacity:0;transition:opacity 0.5s ease;">
+          ${content.substring(0, 400)}${content.length > 400 ? '...' : ''}
+        </div>
+        <div class="content-stats" id="contentStats" style="opacity:0;transition:opacity 0.5s ease 0.3s;">
+          <div class="content-stat">
+            <div class="content-stat__value">${wordCount}</div>
+            <div class="content-stat__label">字符数</div>
+          </div>
+          <div class="content-stat">
+            <div class="content-stat__value">${paraCount}</div>
+            <div class="content-stat__label">段落数</div>
+          </div>
+          <div class="content-stat">
+            <div class="content-stat__value">${Math.ceil(wordCount / 250)}</div>
+            <div class="content-stat__label">预计时长(分)</div>
+          </div>
+          <div class="content-stat">
+            <div class="content-stat__value">${selectedOutputs.size}</div>
+            <div class="content-stat__label">输出形式</div>
+          </div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.getElementById('contentPreview').style.opacity = '1';
+      }, 100);
+      setTimeout(() => {
+        document.getElementById('contentStats').style.opacity = '1';
+        setStatus(0, '✅ 完成');
+        setTimeout(runStep1, 1000);
+      }, 600);
+    }
+
+    // ====== 步骤1：智能分析 ======
+    function runStep1() {
+      currentStep = 1;
+      updateStepVisuals();
+      setStatus(1, '分析中...');
+      const data = getMediaData();
+      const analysis = data.analysis;
+
+      workArea.innerHTML = `
+        <div style="margin-bottom:1rem;color:var(--cyan);font-size:0.875rem;font-weight:600;"
+          >🧠 AI 正在分析内容...</div>
+        <div class="analysis-cards">
+          <div class="analysis-card" style="animation-delay:0s;">
+            <div class="analysis-card__icon">🎯</div>
+            <div class="analysis-card__title">关键信息提取</div>
+            <div class="analysis-card__content">
+              识别出 ${analysis.keyPoints.length} 个核心信息点
+              <div style="margin-top:0.5rem;">
+                ${analysis.keyPoints.map(p => `<span class="analysis-card__tag">${p}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="analysis-card" style="animation-delay:0.2s;">
+            <div class="analysis-card__icon">💭</div>
+            <div class="analysis-card__title">情感基调分析</div>
+            <div class="analysis-card__content">
+              <strong style="color:var(--cyan);">${analysis.sentiment}</strong><br>
+              情感分数: 0.87 / 1.0<br>
+              适合采用${getStyleLabel(selectedStyle)}视觉风格
+            </div>
+          </div>
+          <div class="analysis-card" style="animation-delay:0.4s;">
+            <div class="analysis-card__icon">🔤</div>
+            <div class="analysis-card__title">关键词识别</div>
+            <div class="analysis-card__content">
+              提取 ${analysis.keywords.length} 个高频关键词
+              <div style="margin-top:0.5rem;">
+                ${analysis.keywords.map(k => `<span class="analysis-card__tag">${k}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;padding:1rem;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:0.75rem;">
+          <div style="font-size:0.875rem;color:var(--text-secondary);line-height:1.7;">
+            <strong style="color:var(--cyan);">📋 生成方案：</strong>基于内容分析，AI 建议生成
+            <strong>${analysis.duration}</strong> 的视频内容，分 <strong>${data.storyboard.length}</strong> 个场景呈现，
+            并同步产出信息图与封面图。视觉风格建议采用「<strong>${getStyleLabel(selectedStyle)}</strong>」调性。
+          </div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        setStatus(1, '✅ 完成');
+        setTimeout(runStep2, 1200);
+      }, 1200);
+    }
+
+    function getStyleLabel(key) {
+      const map = { tech: '科技感', warm: '温暖人文', minimal: '极简现代', vibrant: '活力缤纷' };
+      return map[key] || key;
+    }
+
+    // ====== 步骤2：素材匹配 ======
+    function runStep2() {
+      currentStep = 2;
+      updateStepVisuals();
+      setStatus(2, '匹配中...');
+      const data = getMediaData();
+
+      let html = `
+        <div style="margin-bottom:0.75rem;color:var(--cyan);font-size:0.875rem;font-weight:600;"
+          >🎬 正在生成分镜脚本与匹配素材...</div>
+        <div class="storyboard" id="storyboard"></div>
+        <div style="margin-bottom:0.75rem;color:var(--text-muted);font-size:0.75rem;"
+          >🎨 正在匹配与生成多媒体素材...</div>
+        <div class="material-grid" id="materialGrid"></div>
+      `;
+      workArea.innerHTML = html;
+
+      const storyboardEl = document.getElementById('storyboard');
+      const materialGridEl = document.getElementById('materialGrid');
+
+      // 分镜卡片
+      let si = 0;
+      function addScene() {
+        if (si >= data.storyboard.length) {
+          // 开始素材网格
+          setTimeout(() => addMaterial(0), 300);
+          return;
+        }
+        const s = data.storyboard[si];
+        const div = document.createElement('div');
+        div.className = 'scene-card';
+        div.style.animationDelay = '0s';
+        div.innerHTML = `
+          <div class="scene-card__visual">${s.visualDesc.split(' ')[0]}</div>
+          <div class="scene-card__label">场景 ${si + 1} · ${s.scene}</div>
+          <div class="scene-card__text">${s.content}</div>
+          <div class="scene-card__time">⏱ ${s.duration}</div>
+        `;
+        storyboardEl.appendChild(div);
+        si++;
+        setTimeout(addScene, 350);
+      }
+
+      // 素材网格
+      let mi = 0;
+      function addMaterial(idx) {
+        if (idx >= data.materials.length) {
+          setStatus(2, '✅ 完成');
+          setTimeout(runStep3, 1000);
+          return;
+        }
+        const m = data.materials[idx];
+        const div = document.createElement('div');
+        div.className = 'material-grid__item';
+        div.style.animationDelay = '0s';
+        div.innerHTML = `
+          <div class="material-grid__icon">${m.icon}</div>
+          <div class="material-grid__label">${m.label}</div>
+          <div class="material-grid__status">${m.status}</div>
+        `;
+        materialGridEl.appendChild(div);
+        setTimeout(() => addMaterial(idx + 1), 300);
+      }
+
+      addScene();
+    }
+
+    // ====== 步骤3：多媒体合成 ======
+    function runStep3() {
+      currentStep = 3;
+      updateStepVisuals();
+      setStatus(3, '合成中...');
+      const data = getMediaData();
+
+      workArea.innerHTML = `
+        <div style="margin-bottom:0.75rem;color:var(--cyan);font-size:0.875rem;font-weight:600;"
+          >⚙️ 正在合成多媒体内容...</div>
+        <div id="composePanels"></div>
+      `;
+
+      const panelsEl = document.getElementById('composePanels');
+      const outputs = [];
+      if (selectedOutputs.has('video') || selectedOutputs.has('longvideo')) outputs.push('video');
+      if (selectedOutputs.has('infographic')) outputs.push('infographic');
+      if (selectedOutputs.has('poster')) outputs.push('poster');
+
+      let pi = 0;
+      function addPanel() {
+        if (pi >= outputs.length) {
+          setTimeout(() => {
+            setStatus(3, '✅ 完成');
+            setTimeout(runStep4, 1000);
+          }, 1500);
+          return;
+        }
+        const key = outputs[pi];
+        const compose = data.compose[key];
+
+        const div = document.createElement('div');
+        div.className = 'compose-panel';
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(10px)';
+        div.style.transition = 'all 0.4s ease';
+        div.innerHTML = `
+          <div class="compose-panel__header">
+            <span>${compose.name}</span>
+            <span style="margin-left:auto;color:var(--text-muted);font-size:0.75rem;font-weight:400;"
+              id="progressText${key}">0%</span>
+          </div>
+          <div class="compose-progress">
+            <div class="compose-progress__fill" id="progressFill${key}" style="width:0%"></div>
+          </div>
+          <div class="compose-log" id="log${key}"></div>
+        `;
+        panelsEl.appendChild(div);
+
+        setTimeout(() => {
+          div.style.opacity = '1';
+          div.style.transform = 'translateY(0)';
+          animatePanel(key, compose);
+        }, 100);
+
+        pi++;
+        setTimeout(addPanel, 600);
+      }
+
+      function animatePanel(key, compose) {
+        const fill = document.getElementById('progressFill' + key);
+        const text = document.getElementById('progressText' + key);
+        const log = document.getElementById('log' + key);
+        let li = 0;
+
+        function addLog() {
+          if (li >= compose.logs.length) {
+            fill.style.width = '100%';
+            text.textContent = '100%';
+            return;
+          }
+          const item = document.createElement('div');
+          item.className = 'compose-log__item';
+          const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+          item.innerHTML = `
+            <span class="compose-log__time">[${time}]</span>
+            <span class="compose-log__text">${compose.logs[li]}</span>
+          `;
+          log.appendChild(item);
+          log.scrollTop = log.scrollHeight;
+
+          const pct = ((li + 1) / compose.logs.length) * 100;
+          fill.style.width = pct + '%';
+          text.textContent = Math.round(pct) + '%';
+
+          li++;
+          setTimeout(addLog, 400 + Math.random() * 300);
+        }
+        addLog();
+      }
+
+      addPanel();
+    }
+
+    // ====== 步骤4：成品输出 ======
+    function runStep4() {
+      currentStep = 4;
+      updateStepVisuals();
+      setStatus(4, '输出中...');
+      const data = getMediaData();
+      const outputs = data.outputs;
+
+      let html = `
+        <div style="margin-bottom:1rem;color:var(--cyan);font-size:0.875rem;font-weight:600;"
+          >🎉 多媒体内容生成完成！</div>
+        <div class="output-showcase">
+          <div>
+            <div class="video-player" style="margin-bottom:1rem;">
+              <div class="video-player__screen">
+                <div class="video-player__play">▶</div>
+                <div class="video-player__title">${data.compose.video.name}</div>
+              </div>
+              <div class="video-player__controls">
+                <span style="font-size:0.75rem;">▶</span>
+                <div class="video-player__progress">
+                  <div class="video-player__progress-bar"></div>
+                </div>
+                <span class="video-player__time">0:00 / ${outputs.video.duration}</span>
+              </div>
+            </div>
+      `;
+
+      if (outputs.infographic) {
+        html += `
+            <div class="infographic-preview">
+              <div class="infographic-preview__icon">📊</div>
+              <div class="infographic-preview__title">信息图：${data.analysis.keyPoints[0]}</div>
+              <div class="infographic-preview__desc">
+                ${outputs.infographic.format} · ${outputs.infographic.dimensions}<br>
+                包含数据可视化与关键信息提炼
+              </div>
+            </div>
+        `;
+      }
+
+      html += `
+          </div>
+          <div class="output-sidebar">
+      `;
+
+      if (outputs.video) {
+        html += `
+            <div class="output-card">
+              <div class="output-card__icon">🎬</div>
+              <div class="output-card__title">短视频</div>
+              <div class="output-card__meta">${outputs.video.duration} · ${outputs.video.resolution} · ${outputs.video.size}</div>
+              <span class="output-card__btn">下载 MP4</span>
+            </div>
+        `;
+      }
+
+      if (outputs.infographic) {
+        html += `
+            <div class="output-card">
+              <div class="output-card__icon">📊</div>
+              <div class="output-card__title">信息图</div>
+              <div class="output-card__meta">${outputs.infographic.format} · ${outputs.infographic.dimensions}</div>
+              <span class="output-card__btn">下载 PNG</span>
+            </div>
+        `;
+      }
+
+      if (outputs.poster) {
+        html += `
+            <div class="output-card">
+              <div class="output-card__icon">🖼️</div>
+              <div class="output-card__title">封面图</div>
+              <div class="output-card__meta">${outputs.poster.format} · ${outputs.poster.dimensions}</div>
+              <span class="output-card__btn">下载 PNG</span>
+            </div>
+        `;
+      }
+
+      html += `
+            <div class="output-card">
+              <div class="output-card__icon">📈</div>
+              <div class="output-card__title">生成效率</div>
+              <div class="output-card__meta">
+                视频生成耗时: 3分12秒<br>
+                较传统方式节省: 95%
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      workArea.innerHTML = html;
+      setStatus(4, '✅ 完成');
+      isRunning = false;
+      generateBtn.disabled = false;
+      generateBtn.textContent = '🎬 再次生成';
+    }
+  </script>
+</body>
+</html>
