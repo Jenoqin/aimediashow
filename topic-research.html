@@ -3,76 +3,356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI如何革新传媒行业选题策划——热点追踪、趋势预测、智能选题推荐">
-  <title>选题策划 | AI × 传媒变革</title>
+  <meta name="description" content="AI热点实时追踪工作流演示系统——多平台监测、趋势预测、选题推荐">
+  <title>热点追踪 | AI × 传媒变革</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    /* Detail page specific overrides */
+    /* ====== 页面特定样式 ====== */
     .detail-hero {
-      min-height: 50vh;
-      padding-top: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      min-height: 40vh; padding-top: 5rem;
+      display: flex; align-items: center; justify-content: center; text-align: center;
       background:
         radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--theme-color) 8%, transparent) 0%, transparent 60%),
         radial-gradient(ellipse at 20% 70%, rgba(124, 58, 237, 0.06) 0%, transparent 50%);
     }
-    .detail-content {
-      max-width: 800px;
+
+    /* ====== 热点监控仪表盘 ====== */
+    .dashboard-section {
+      max-width: min(90vw, 72rem);
       margin: 0 auto;
-      padding: 40px 32px 80px;
+      padding: 3rem 1.5rem;
     }
-    .detail-section {
-      margin-bottom: 48px;
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 2rem;
     }
-    .detail-section h3 {
-      font-size: 20px;
-      margin-bottom: 12px;
-      color: var(--theme-color, var(--cyan));
+    .dashboard-header h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 0.5rem;
     }
-    .detail-section p {
+    .dashboard-header p {
       color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 12px;
+      font-size: 0.9375rem;
     }
-    .detail-section ul {
+
+    /* 平台筛选标签 */
+    .platform-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .platform-tab {
+      padding: 0.5rem 1.25rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      background: transparent;
       color: var(--text-secondary);
-      line-height: 1.8;
-      padding-left: 24px;
     }
-    .detail-section li {
-      margin-bottom: 8px;
+    .platform-tab:hover {
+      border-color: var(--orange);
+      color: var(--orange);
     }
-    .detail-back {
-      display: inline-flex;
+    .platform-tab.active {
+      background: var(--orange);
+      color: #fff;
+      border-color: var(--orange);
+    }
+
+    /* 热点卡片网格 */
+    .hot-topics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 768px) {
+      .hot-topics-grid { grid-template-columns: 1fr; }
+    }
+
+    .topic-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .topic-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--orange);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .topic-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.3);
+    }
+    .topic-card:hover::before { opacity: 1; }
+    .topic-card.active {
+      border-color: var(--orange);
+      box-shadow: 0 0 24px rgba(249, 115, 22, 0.2);
+    }
+    .topic-card.active::before { opacity: 1; }
+
+    .topic-card__header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .topic-card__rank {
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 0.375rem;
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--orange);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.875rem; font-weight: 700;
+    }
+    .topic-card__platform {
+      font-size: 0.75rem; color: var(--text-muted);
+      padding: 0.125rem 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 0.25rem;
+    }
+    .topic-card__title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+    .topic-card__footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topic-card__heat {
+      display: flex; flex-direction: column;
+    }
+    .topic-card__heat-value {
+      font-size: 1.125rem; font-weight: 700; color: var(--orange);
+    }
+    .topic-card__heat-label {
+      font-size: 0.6875rem; color: var(--text-muted);
+    }
+    .topic-card__bar {
+      width: 6rem; height: 0.375rem;
+      background: rgba(255,255,255,0.08);
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+    .topic-card__bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--orange), #fb923c);
+      border-radius: 0.25rem;
+      transition: width 0.8s ease;
+    }
+    .topic-card__sparkline {
+      width: 5rem; height: 2rem;
+    }
+
+    /* ====== AI 分析流程面板 ====== */
+    .analysis-section {
+      max-width: min(90vw, 72rem);
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+    .analysis-placeholder {
+      background: var(--bg-card);
+      border: 2px dashed rgba(255,255,255,0.08);
+      border-radius: 1rem;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    .analysis-content {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    /* 步骤指示器 */
+    .step-indicator {
+      display: flex;
       align-items: center;
-      gap: 8px;
-      color: var(--text-secondary);
-      font-size: 14px;
-      margin-bottom: 24px;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .step-indicator::before {
+      content: '';
+      position: absolute; top: 1rem; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,0.08);
+      z-index: 0;
+    }
+    .step-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.5rem;
+      position: relative; z-index: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0 0.5rem;
+    }
+    .step-item__dot {
+      width: 2rem; height: 2rem;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      background: var(--bg);
+      border: 2px solid rgba(255,255,255,0.15);
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .step-item.active .step-item__dot {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+    }
+    .step-item.completed .step-item__dot {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+    .step-item__label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
       transition: color 0.3s;
     }
-    .detail-back:hover {
-      color: var(--cyan);
+    .step-item.active .step-item__label {
+      color: var(--orange);
     }
-    .detail-highlight {
-      background: color-mix(in srgb, var(--theme-color) 10%, transparent);
-      border: 1px solid color-mix(in srgb, var(--theme-color) 20%, transparent);
-      border-radius: 12px;
-      padding: 20px 24px;
-      margin: 16px 0;
+
+    .step-controls {
+      display: flex; justify-content: flex-end; gap: 0.5rem;
+      margin-bottom: 1rem;
     }
-    .detail-highlight strong {
-      color: var(--theme-color);
-      font-size: 24px;
-      display: block;
-      margin-bottom: 4px;
-    }
-    .detail-highlight span {
+    .step-btn {
+      padding: 0.375rem 0.875rem;
+      border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
       color: var(--text-secondary);
-      font-size: 13px;
+      transition: all 0.3s;
+    }
+    .step-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    /* 步骤面板 */
+    .step-panel {
+      display: none;
+      animation: panelIn 0.5s ease;
+    }
+    .step-panel.active {
+      display: block;
+    }
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .step-panel__title {
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+      color: var(--orange);
+    }
+    .chart-wrapper {
+      position: relative;
+      height: 280px;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 768px) {
+      .chart-wrapper { height: 220px; }
+    }
+
+    /* 预测结论面板 */
+    .prediction-result {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .prediction-result { grid-template-columns: 1fr; gap: 1.5rem; }
+    }
+    .prediction-score {
+      text-align: center;
+    }
+    .prediction-score__value {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--orange);
+      line-height: 1;
+    }
+    .prediction-score__label {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .prediction-verdict {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      border-radius: 2rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .prediction-verdict.follow {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+    }
+    .prediction-verdict.watch {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--gold);
+    }
+    .prediction-verdict.skip {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+    .prediction-suggestion {
+      background: rgba(249, 115, 22, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+    }
+    .prediction-suggestion__title {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-bottom: 0.375rem;
+    }
+    .prediction-suggestion__text {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    .analysis-meta {
+      display: flex; gap: 1.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .analysis-meta__item {
+      display: flex; flex-direction: column;
+    }
+    .analysis-meta__value {
+      font-size: 1.25rem; font-weight: 700; color: var(--text);
+    }
+    .analysis-meta__label {
+      font-size: 0.6875rem; color: var(--text-muted);
     }
   </style>
 </head>
@@ -96,75 +376,130 @@
   <section class="detail-hero">
     <div class="hero__grid-bg"></div>
     <div class="hero__content">
-      <div class="hero__badge">🔥 选题策划</div>
+      <div class="hero__badge">🔥 热点追踪</div>
       <h1 class="hero__title">让 AI 成为你的<span style="color: var(--orange)">首席情报官</span></h1>
-      <p class="hero__subtitle">实时追踪全网热点，预测话题趋势，智能推荐最优选题方向<br>告别"拍脑袋"决策，让数据驱动每一个选题</p>
+      <p class="hero__subtitle">实时监测全网热点，AI 驱动的追踪与预测工作流演示</p>
     </div>
   </section>
 
-  <main class="detail-content">
-    <a href="index.html" class="detail-back">← 返回首页</a>
+  <!-- ====== 热点监控仪表盘 ====== -->
+  <section class="dashboard-section">
+    <div class="dashboard-header">
+      <h2>🔥 实时热点监控</h2>
+      <p>AI 正在追踪全网 5 大平台的热门话题，点击任意热点查看深度分析</p>
+    </div>
 
-    <article class="detail-section" id="hot-tracking">
-      <h3>场景一：热点追踪</h3>
-      <p>传统的新闻热点发现依赖编辑的经验和直觉，往往存在滞后性。AI 驱动的热点追踪系统通过实时监测全网数十个平台的数据流，能够在热点萌芽阶段就发出预警，让媒体机构抢占报道先机。</p>
-      <ul>
-        <li><strong>全网监测覆盖</strong>：同时追踪微博、抖音、微信公众号、知乎、B站、新闻客户端等主流平台，以及海外社交媒体的数据流</li>
-        <li><strong>秒级发现速度</strong>：基于流式数据处理架构，热点事件从发生到被系统识别平均仅需 5 分钟</li>
-        <li><strong>多维度热度评估</strong>：综合考量传播速度、参与人数、情感倾向、地域分布等指标，生成全面的热度画像</li>
-        <li><strong>智能去重关联</strong>：自动识别同一事件在不同平台的表述差异，避免重复跟踪，并将相关子话题聚类</li>
-      </ul>
-      <div class="detail-highlight">
-        <strong>5min</strong>
-        <span>热点发现速度——从事件发生到系统预警的平均时间</span>
-      </div>
-    </article>
+    <div class="platform-tabs" id="platformTabs">
+      <div class="platform-tab active" data-platform="all">全部</div>
+      <div class="platform-tab" data-platform="weibo">微博</div>
+      <div class="platform-tab" data-platform="xiaohongshu">小红书</div>
+      <div class="platform-tab" data-platform="douyin">抖音</div>
+      <div class="platform-tab" data-platform="zhihu">知乎</div>
+      <div class="platform-tab" data-platform="bilibili">B站</div>
+    </div>
 
-    <article class="detail-section" id="trend-prediction">
-      <h3>场景二：趋势预测</h3>
-      <p>AI 不仅能告诉你"现在什么火"，更能预测"什么即将火"。通过分析历史数据中的传播规律、周期性特征和影响因素，趋势预测模型能够为编辑团队提供具有前瞻性的选题建议。</p>
-      <ul>
-        <li><strong>历史模式学习</strong>：基于过去 3-5 年的话题传播数据，训练深度学习模型识别"爆火前兆"的典型特征</li>
-        <li><strong>多因素建模</strong>：综合考虑时间周期（节假日、两会、体育赛事等）、社会情绪、关联事件、KOL 动态等多维度因素</li>
-        <li><strong>预测准确度验证</strong>：模型在内部测试集上达到 92% 的短期趋势（24-72 小时）预测准确率</li>
-        <li><strong>置信度分级</strong>：每个预测结果附带置信度评分，帮助编辑判断风险与机会的平衡</li>
-      </ul>
-      <div class="detail-highlight">
-        <strong>92%</strong>
-        <span>趋势预测准确率——短期趋势（24-72 小时）的预测命中比例</span>
-      </div>
-    </article>
+    <div class="hot-topics-grid" id="hotTopicsGrid"></div>
+  </section>
 
-    <article class="detail-section" id="topic-recommendation">
-      <h3>场景三：选题推荐</h3>
-      <p>每个媒体机构都有自己的定位、受众和风格。AI 选题推荐系统不仅考虑话题本身的热度，更将媒体的品牌定位、历史表现数据、受众画像和竞争格局纳入推荐模型，实现"千人千面"的个性化选题建议。</p>
-      <ul>
-        <li><strong>媒体定位匹配</strong>：分析媒体的历史内容库，自动学习其风格偏好、擅长领域和价值观取向</li>
-        <li><strong>受众画像分析</strong>：基于用户阅读行为数据，构建受众兴趣图谱，推荐最可能引发共鸣的话题</li>
-        <li><strong>差异化竞争</strong>：监测竞品媒体的选题动向，推荐"蓝海"话题——受众关注度高但竞品覆盖少的领域</li>
-        <li><strong>选题组合优化</strong>：不只是推荐单个选题，而是提供一整组选题组合建议，确保内容矩阵的均衡覆盖</li>
-      </ul>
-      <div class="detail-highlight">
-        <strong>3×</strong>
-        <span>爆款选题命中率——相比传统人工选题方式的提升倍数</span>
+  <!-- ====== AI 分析流程面板 ====== -->
+  <section class="analysis-section">
+    <div class="analysis-placeholder" id="analysisPlaceholder">
+      👆 点击上方任意热点，查看 AI 深度分析流程
+    </div>
+    <div class="analysis-content" id="analysisContent" style="display:none;">
+      <div class="step-controls">
+        <button class="step-btn" id="playPauseBtn">▶️ 自动播放</button>
       </div>
-    </article>
+      <div class="step-indicator" id="stepIndicator">
+        <div class="step-item active" data-step="0">
+          <div class="step-item__dot">1</div>
+          <div class="step-item__label">热度分析</div>
+        </div>
+        <div class="step-item" data-step="1">
+          <div class="step-item__dot">2</div>
+          <div class="step-item__label">情感研判</div>
+        </div>
+        <div class="step-item" data-step="2">
+          <div class="step-item__dot">3</div>
+          <div class="step-item__label">传播溯源</div>
+        </div>
+        <div class="step-item" data-step="3">
+          <div class="step-item__dot">4</div>
+          <div class="step-item__label">趋势预测</div>
+        </div>
+      </div>
 
-    <article class="detail-section">
-      <h3>数据与趋势</h3>
-      <p>AI 选题策划技术正在从辅助工具向核心基础设施演进。头部媒体机构已普遍部署相关系统，行业采用率持续攀升。</p>
-      <ul>
-        <li><strong>行业采用率</strong>：78% 的头部媒体机构已引入 AI 辅助选题工具，其中 45% 将其纳入日常采编流程</li>
-        <li><strong>效率提升</strong>：使用 AI 选题系统的编辑团队，日均选题产出量提升 2.5 倍，选题会时长缩短 60%</li>
-        <li><strong>未来方向</strong>：从"推荐选题"向"预测选题"进化——AI 将具备提前 7-14 天预判社会话题走向的能力</li>
-        <li><strong>人机协作趋势</strong>：编辑角色从"选题决策者"转变为"选题策展人"——负责评估 AI 建议、把控价值导向、注入人文关怀</li>
-      </ul>
-      <div class="detail-highlight">
-        <strong>78%</strong>
-        <span>头部媒体 AI 选题工具采用率</span>
+      <!-- 步骤1: 热度分析 -->
+      <div class="step-panel active" data-step="0">
+        <div class="step-panel__title">📈 24小时热度趋势</div>
+        <div class="chart-wrapper"><canvas id="heatChart"></canvas></div>
+        <div class="analysis-meta">
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="heatPeak">--</div>
+            <div class="analysis-meta__label">峰值热度</div>
+          </div>
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="heatGrowth">--</div>
+            <div class="analysis-meta__label">增长率</div>
+          </div>
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="heatVelocity">--</div>
+            <div class="analysis-meta__label">传播速度</div>
+          </div>
+        </div>
       </div>
-    </article>
-  </main>
+
+      <!-- 步骤2: 情感研判 -->
+      <div class="step-panel" data-step="1">
+        <div class="step-panel__title">🎭 舆论情感分布</div>
+        <div class="chart-wrapper"><canvas id="sentimentChart"></canvas></div>
+        <div class="analysis-meta">
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="sentimentMain">--</div>
+            <div class="analysis-meta__label">主导情感</div>
+          </div>
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="sentimentPolarity">--</div>
+            <div class="analysis-meta__label">正负面比</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤3: 传播溯源 -->
+      <div class="step-panel" data-step="2">
+        <div class="step-panel__title">🌐 平台传播占比</div>
+        <div class="chart-wrapper"><canvas id="platformChart"></canvas></div>
+        <div class="analysis-meta">
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="platformMain">--</div>
+            <div class="analysis-meta__label">主发酵平台</div>
+          </div>
+          <div class="analysis-meta__item">
+            <div class="analysis-meta__value" id="platformCount">--</div>
+            <div class="analysis-meta__label">覆盖平台数</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤4: 趋势预测 -->
+      <div class="step-panel" data-step="3">
+        <div class="step-panel__title">🔮 AI 预测结论</div>
+        <div class="prediction-result">
+          <div class="prediction-score">
+            <div class="prediction-score__value" id="predConfidence">--</div>
+            <div class="prediction-score__label">置信度</div>
+          </div>
+          <div>
+            <div class="prediction-verdict" id="predVerdict">--</div>
+            <div class="prediction-suggestion">
+              <div class="prediction-suggestion__title">选题建议</div>
+              <div class="prediction-suggestion__text" id="predSuggestion">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <footer class="footer">
     <div class="footer__inner">
@@ -180,6 +515,491 @@
       <div class="footer__copyright">© 2026 AI × 传媒变革. 技术引领，探索未来.</div>
     </div>
   </footer>
-  <script src="scripts.js"></script>
+
+  <script>
+    // ====== 模拟数据 ======
+    const platformNames = {
+      weibo: '微博', xiaohongshu: '小红书', douyin: '抖音',
+      zhihu: '知乎', bilibili: 'B站'
+    };
+
+    const mockTopics = [
+      {
+        id: 1, platform: 'weibo',
+        title: '杭州亚运会开幕式亮点回顾',
+        heat: 2847300,
+        heatHistory: [120, 350, 890, 2100, 4500, 8900, 15600, 28473],
+        sentiment: { positive: 62, negative: 8, angry: 5, worried: 12, sarcastic: 13 },
+        platformShare: { weibo: 42, xiaohongshu: 18, douyin: 28, zhihu: 8, bilibili: 4 },
+        prediction: { confidence: 92, verdict: 'follow', suggestion: '从"数字人点火"技术创新角度切入，结合人文关怀视角，预估触达 500W+' }
+      },
+      {
+        id: 2, platform: 'douyin',
+        title: '新人结婚不要彩礼引热议',
+        heat: 1956000,
+        heatHistory: [80, 200, 600, 1800, 3200, 5800, 12000, 19560],
+        sentiment: { positive: 35, negative: 28, angry: 18, worried: 12, sarcastic: 7 },
+        platformShare: { weibo: 25, xiaohongshu: 15, douyin: 45, zhihu: 10, bilibili: 5 },
+        prediction: { confidence: 78, verdict: 'watch', suggestion: '社会议题敏感度高，建议持续观察舆论走向，暂不主动跟进' }
+      },
+      {
+        id: 3, platform: 'xiaohongshu',
+        title: '特种兵式旅游攻略合集',
+        heat: 1523000,
+        heatHistory: [300, 800, 1500, 2800, 4200, 6800, 11000, 15230],
+        sentiment: { positive: 55, negative: 10, angry: 3, worried: 8, sarcastic: 24 },
+        platformShare: { weibo: 15, xiaohongshu: 48, douyin: 22, zhihu: 10, bilibili: 5 },
+        prediction: { confidence: 85, verdict: 'follow', suggestion: '结合国庆假期推出"3天2城"系列攻略，主打年轻群体' }
+      },
+      {
+        id: 4, platform: 'zhihu',
+        title: '如何评价最新的 AI 大模型进展',
+        heat: 987000,
+        heatHistory: [200, 450, 700, 950, 1200, 1800, 3500, 9870],
+        sentiment: { positive: 40, negative: 15, angry: 8, worried: 22, sarcastic: 15 },
+        platformShare: { weibo: 18, xiaohongshu: 8, douyin: 12, zhihu: 55, bilibili: 7 },
+        prediction: { confidence: 72, verdict: 'watch', suggestion: '技术话题受众垂直，建议结合具体应用场景做深度解读' }
+      },
+      {
+        id: 5, platform: 'bilibili',
+        title: '某知名UP主道歉视频引发讨论',
+        heat: 2145000,
+        heatHistory: [500, 2000, 8000, 15000, 12000, 18000, 22000, 21450],
+        sentiment: { positive: 12, negative: 58, angry: 20, worried: 5, sarcastic: 5 },
+        platformShare: { weibo: 30, xiaohongshu: 10, douyin: 20, zhihu: 15, bilibili: 25 },
+        prediction: { confidence: 95, verdict: 'follow', suggestion: '舆论风暴级事件，建议从"创作者责任与公众监督"角度做评论，注意客观中立' }
+      },
+      {
+        id: 6, platform: 'weibo',
+        title: ' iPhone 16 发布会前瞻',
+        heat: 1234000,
+        heatHistory: [100, 300, 600, 1200, 2500, 4800, 8500, 12340],
+        sentiment: { positive: 45, negative: 25, angry: 5, worried: 10, sarcastic: 15 },
+        platformShare: { weibo: 50, xiaohongshu: 15, douyin: 20, zhihu: 12, bilibili: 3 },
+        prediction: { confidence: 88, verdict: 'follow', suggestion: '发布前做参数预测文，发布后做"实测对比"系列，抢搜索流量' }
+      },
+      {
+        id: 7, platform: 'douyin',
+        title: '预制菜进校园家长担忧',
+        heat: 1689000,
+        heatHistory: [150, 400, 1200, 3500, 8000, 12000, 15000, 16890],
+        sentiment: { positive: 8, negative: 52, angry: 28, worried: 10, sarcastic: 2 },
+        platformShare: { weibo: 20, xiaohongshu: 12, douyin: 48, zhihu: 15, bilibili: 5 },
+        prediction: { confidence: 91, verdict: 'follow', suggestion: '民生敏感话题，建议从政策解读和营养科普角度切入，避免煽情' }
+      },
+      {
+        id: 8, platform: 'xiaohongshu',
+        title: '秋日美拉德穿搭指南',
+        heat: 756000,
+        heatHistory: [50, 150, 400, 900, 2000, 3800, 5600, 7560],
+        sentiment: { positive: 68, negative: 5, angry: 2, worried: 3, sarcastic: 22 },
+        platformShare: { weibo: 10, xiaohongshu: 55, douyin: 25, zhihu: 5, bilibili: 5 },
+        prediction: { confidence: 65, verdict: 'watch', suggestion: '时尚话题周期短，建议结合具体单品推荐做快内容' }
+      },
+      {
+        id: 9, platform: 'zhihu',
+        title: '35岁职场危机真的存在吗',
+        heat: 892000,
+        heatHistory: [100, 300, 800, 1500, 2800, 4500, 6800, 8920],
+        sentiment: { positive: 15, negative: 35, angry: 20, worried: 25, sarcastic: 5 },
+        platformShare: { weibo: 22, xiaohongshu: 10, douyin: 15, zhihu: 48, bilibili: 5 },
+        prediction: { confidence: 82, verdict: 'follow', suggestion: '长期社会议题，建议做深度人物采访或数据调研报道' }
+      },
+      {
+        id: 10, platform: 'bilibili',
+        title: '国产3A游戏实机演示放出',
+        heat: 1345000,
+        heatHistory: [200, 600, 1500, 4000, 8000, 11000, 12000, 13450],
+        sentiment: { positive: 72, negative: 8, angry: 5, worried: 10, sarcastic: 5 },
+        platformShare: { weibo: 20, xiaohongshu: 5, douyin: 15, zhihu: 18, bilibili: 42 },
+        prediction: { confidence: 90, verdict: 'follow', suggestion: '游戏玩家群体活跃度高，建议做技术解析和文化意义双角度报道' }
+      },
+      {
+        id: 11, platform: 'weibo',
+        title: '多地出台楼市新政',
+        heat: 1876000,
+        heatHistory: [80, 250, 700, 1800, 4000, 7500, 14000, 18760],
+        sentiment: { positive: 20, negative: 40, angry: 15, worried: 20, sarcastic: 5 },
+        platformShare: { weibo: 45, xiaohongshu: 10, douyin: 25, zhihu: 15, bilibili: 5 },
+        prediction: { confidence: 86, verdict: 'follow', suggestion: '政策解读类内容，建议联系专家做深度分析，注意数据准确性' }
+      },
+      {
+        id: 12, platform: 'douyin',
+        title: '职场00后开始整顿职场',
+        heat: 1567000,
+        heatHistory: [300, 900, 2200, 4500, 7000, 9500, 13000, 15670],
+        sentiment: { positive: 48, negative: 18, angry: 12, worried: 8, sarcastic: 14 },
+        platformShare: { weibo: 25, xiaohongshu: 15, douyin: 45, zhihu: 10, bilibili: 5 },
+        prediction: { confidence: 79, verdict: 'watch', suggestion: '代际话题有热度但易引发争议，建议做客观调研而非站队式内容' }
+      }
+    ];
+
+    // ====== 状态管理 ======
+    let currentFilter = 'all';
+    let selectedTopicId = null;
+    let currentStep = 0;
+    let isPlaying = false;
+    let playInterval = null;
+    let chartInstances = {};
+
+    // ====== DOM 元素 ======
+    const gridEl = document.getElementById('hotTopicsGrid');
+    const tabsEl = document.getElementById('platformTabs');
+    const placeholderEl = document.getElementById('analysisPlaceholder');
+    const contentEl = document.getElementById('analysisContent');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+
+    // ====== 辅助函数 ======
+    function formatHeat(value) {
+      if (value >= 10000) return (value / 10000).toFixed(1) + 'W';
+      if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+      return value.toString();
+    }
+
+    function getMaxHeat() {
+      return Math.max(...mockTopics.map(t => t.heat));
+    }
+
+    // SVG sparkline
+    function createSparkline(data, color = '#f97316') {
+      const w = 80, h = 32;
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const range = max - min || 1;
+      const points = data.map((v, i) => {
+        const x = (i / (data.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return `${x},${y}`;
+      }).join(' ');
+      return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="topic-card__sparkline">
+        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${w}" cy="${h - ((data[data.length-1] - min) / range) * h}" r="3" fill="${color}"/>
+      </svg>`;
+    }
+
+    // ====== 渲染热点卡片 ======
+    function renderCards() {
+      const maxHeat = getMaxHeat();
+      const filtered = currentFilter === 'all'
+        ? [...mockTopics]
+        : mockTopics.filter(t => t.platform === currentFilter);
+      filtered.sort((a, b) => b.heat - a.heat);
+
+      gridEl.innerHTML = filtered.map((topic, idx) => {
+        const isActive = topic.id === selectedTopicId;
+        const heatPercent = (topic.heat / maxHeat) * 100;
+        return `
+          <div class="topic-card ${isActive ? 'active' : ''}" data-id="${topic.id}">
+            <div class="topic-card__header">
+              <div class="topic-card__rank">${idx + 1}</div>
+              <div class="topic-card__platform">${platformNames[topic.platform]}</div>
+            </div>
+            <div class="topic-card__title">${topic.title}</div>
+            <div class="topic-card__footer">
+              <div class="topic-card__heat">
+                <div class="topic-card__heat-value">${formatHeat(topic.heat)}</div>
+                <div class="topic-card__heat-label">实时热度</div>
+              </div>
+              <div class="topic-card__bar">
+                <div class="topic-card__bar-fill" style="width:${heatPercent}%"></div>
+              </div>
+              ${createSparkline(topic.heatHistory)}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 绑定点击事件
+      gridEl.querySelectorAll('.topic-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = parseInt(card.dataset.id);
+          selectTopic(id);
+        });
+      });
+    }
+
+    // ====== 平台筛选 ======
+    tabsEl.querySelectorAll('.platform-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabsEl.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.platform;
+        renderCards();
+      });
+    });
+
+    // ====== 选择话题 ======
+    function selectTopic(id) {
+      selectedTopicId = id;
+      renderCards(); // 更新高亮状态
+
+      // 显示分析面板
+      placeholderEl.style.display = 'none';
+      contentEl.style.display = 'block';
+
+      // 重置步骤
+      currentStep = 0;
+      updateStepIndicator();
+      showStepPanel(0);
+
+      // 渲染当前步骤图表
+      renderStepChart(0);
+      updateAnalysisMeta();
+
+      // 如果正在自动播放，重置计时器
+      if (isPlaying) {
+        clearInterval(playInterval);
+        startAutoPlay();
+      }
+    }
+
+    // ====== 步骤指示器 ======
+    function updateStepIndicator() {
+      document.querySelectorAll('.step-item').forEach((item, idx) => {
+        item.classList.remove('active', 'completed');
+        if (idx < currentStep) item.classList.add('completed');
+        else if (idx === currentStep) item.classList.add('active');
+      });
+    }
+
+    function showStepPanel(step) {
+      document.querySelectorAll('.step-panel').forEach((panel, idx) => {
+        panel.classList.toggle('active', idx === step);
+      });
+    }
+
+    document.querySelectorAll('.step-item').forEach(item => {
+      item.addEventListener('click', () => {
+        currentStep = parseInt(item.dataset.step);
+        updateStepIndicator();
+        showStepPanel(currentStep);
+        renderStepChart(currentStep);
+        updateAnalysisMeta();
+        if (isPlaying) {
+          clearInterval(playInterval);
+          startAutoPlay();
+        }
+      });
+    });
+
+    // ====== 自动播放 ======
+    function startAutoPlay() {
+      isPlaying = true;
+      playPauseBtn.textContent = '⏸️ 暂停';
+      playInterval = setInterval(() => {
+        currentStep++;
+        if (currentStep >= 4) {
+          currentStep = 0;
+        }
+        updateStepIndicator();
+        showStepPanel(currentStep);
+        renderStepChart(currentStep);
+        updateAnalysisMeta();
+      }, 2500);
+    }
+
+    function stopAutoPlay() {
+      isPlaying = false;
+      playPauseBtn.textContent = '▶️ 自动播放';
+      clearInterval(playInterval);
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (isPlaying) stopAutoPlay();
+      else startAutoPlay();
+    });
+
+    // ====== Chart.js 图表渲染 ======
+    function destroyChart(key) {
+      if (chartInstances[key]) {
+        chartInstances[key].destroy();
+        delete chartInstances[key];
+      }
+    }
+
+    function getTopic() {
+      return mockTopics.find(t => t.id === selectedTopicId);
+    }
+
+    function renderStepChart(step) {
+      const topic = getTopic();
+      if (!topic) return;
+
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#8899bb', font: { size: 12 } }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#667' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { color: '#667' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
+        }
+      };
+
+      if (step === 0) {
+        destroyChart('heat');
+        const ctx = document.getElementById('heatChart').getContext('2d');
+        const hours = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+        chartInstances['heat'] = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: hours,
+            datasets: [{
+              label: '热度值',
+              data: topic.heatHistory,
+              borderColor: '#f97316',
+              backgroundColor: 'rgba(249, 115, 22, 0.1)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointBackgroundColor: '#f97316'
+            }]
+          },
+          options: {
+            ...commonOptions,
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      } else if (step === 1) {
+        destroyChart('sentiment');
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        chartInstances['sentiment'] = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: ['正面', '负面', '愤怒', '担忧', '嘲讽'],
+            datasets: [{
+              label: '情感分布',
+              data: [
+                topic.sentiment.positive,
+                topic.sentiment.negative,
+                topic.sentiment.angry,
+                topic.sentiment.worried,
+                topic.sentiment.sarcastic
+              ],
+              borderColor: '#f97316',
+              backgroundColor: 'rgba(249, 115, 22, 0.2)',
+              pointBackgroundColor: '#f97316'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              r: {
+                ticks: { color: '#667', backdropColor: 'transparent' },
+                grid: { color: 'rgba(255,255,255,0.08)' },
+                pointLabels: { color: '#8899bb', font: { size: 12 } }
+              }
+            }
+          }
+        });
+      } else if (step === 2) {
+        destroyChart('platform');
+        const ctx = document.getElementById('platformChart').getContext('2d');
+        const share = topic.platformShare;
+        chartInstances['platform'] = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(share).map(k => platformNames[k]),
+            datasets: [{
+              data: Object.values(share),
+              backgroundColor: [
+                '#f97316', '#ec4899', '#00d4ff', '#7c3aed', '#10b981'
+              ],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: { color: '#8899bb', font: { size: 12 }, padding: 16 }
+              }
+            }
+          }
+        });
+      } else if (step === 3) {
+        // 纯 DOM 更新，无需 Chart.js
+      }
+    }
+
+    // ====== 更新分析元数据 ======
+    function updateAnalysisMeta() {
+      const topic = getTopic();
+      if (!topic) return;
+
+      if (currentStep === 0) {
+        const peak = Math.max(...topic.heatHistory);
+        const growth = ((topic.heatHistory[7] - topic.heatHistory[0]) / topic.heatHistory[0] * 100).toFixed(0);
+        document.getElementById('heatPeak').textContent = formatHeat(peak * 100);
+        document.getElementById('heatGrowth').textContent = '+' + growth + '%';
+        document.getElementById('heatVelocity').textContent = growth > 500 ? '🔥 爆发' : growth > 200 ? '⚡ 快速' : '📈 平稳';
+      } else if (currentStep === 1) {
+        const maxSent = Object.entries(topic.sentiment).sort((a, b) => b[1] - a[1])[0];
+        const labels = { positive: '正面', negative: '负面', angry: '愤怒', worried: '担忧', sarcastic: '嘲讽' };
+        document.getElementById('sentimentMain').textContent = labels[maxSent[0]];
+        const ratio = (topic.sentiment.positive / (topic.sentiment.negative || 1)).toFixed(1);
+        document.getElementById('sentimentPolarity').textContent = ratio + ':1';
+      } else if (currentStep === 2) {
+        const maxPlat = Object.entries(topic.platformShare).sort((a, b) => b[1] - a[1])[0];
+        document.getElementById('platformMain').textContent = platformNames[maxPlat[0]];
+        document.getElementById('platformCount').textContent = '5';
+      } else if (currentStep === 3) {
+        animateNumber(document.getElementById('predConfidence'), topic.prediction.confidence, '%');
+        const verdictEl = document.getElementById('predVerdict');
+        const verdictMap = {
+          follow: { text: '🔥 建议立即跟进', class: 'follow' },
+          watch: { text: '⏳ 持续观察', class: 'watch' },
+          skip: { text: '❄️ 暂不推荐', class: 'skip' }
+        };
+        const v = verdictMap[topic.prediction.verdict];
+        verdictEl.textContent = v.text;
+        verdictEl.className = 'prediction-verdict ' + v.class;
+        document.getElementById('predSuggestion').textContent = topic.prediction.suggestion;
+      }
+    }
+
+    // 数字滚动动画
+    function animateNumber(el, target, suffix = '') {
+      const duration = 800;
+      const start = 0;
+      const startTime = performance.now();
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(start + (target - start) * ease);
+        el.textContent = current + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // ====== 定时更新热度（模拟实时） ======
+    setInterval(() => {
+      mockTopics.forEach(t => {
+        const change = (Math.random() - 0.4) * 0.1; // -4% ~ +6%
+        t.heat = Math.max(100000, Math.round(t.heat * (1 + change)));
+      });
+      renderCards();
+    }, 3000);
+
+    // ====== 初始化 ======
+    renderCards();
+  </script>
 </body>
 </html>
