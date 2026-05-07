@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI智能撰稿工作流演示系统——素材采集、大纲生成、初稿撰写、风格润色、成品输出">
+  <meta name="description" content="AI智能撰稿工作流演示系统——话题选择、素材采集、大纲生成、智能撰写、风格润色、成品输出">
   <title>智能撰稿 | AI × 传媒变革</title>
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -42,6 +42,70 @@
       color: var(--text-muted);
       margin-top: 0.25rem;
     }
+
+    /* 话题选择 */
+    .topic-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .topic-link {
+      font-size: 0.75rem;
+      color: var(--orange);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: opacity 0.3s;
+    }
+    .topic-link:hover { opacity: 0.8; }
+    .topic-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    @media (max-width: 768px) { .topic-options { grid-template-columns: 1fr; } }
+    .topic-option {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .topic-option:hover { border-color: rgba(0, 212, 255, 0.3); }
+    .topic-option.active {
+      border-color: var(--cyan);
+      background: rgba(0, 212, 255, 0.08);
+    }
+    .topic-option__title { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.375rem; }
+    .topic-option__meta { font-size: 0.75rem; color: var(--text-muted); }
+    .topic-option__heat {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--orange);
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+    .topic-option__tags {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+      margin-top: 0.375rem;
+    }
+    .topic-option__tag {
+      font-size: 0.625rem;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+    }
+
+    /* 文章类型 */
     .type-options {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -64,6 +128,97 @@
     }
     .type-option__icon { font-size: 1.5rem; margin-bottom: 0.375rem; }
     .type-option__name { font-size: 0.8125rem; font-weight: 600; }
+
+    /* RAG */
+    .rag-section {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+    }
+    .rag-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .rag-toggle__switch {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      position: relative;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+    .rag-toggle__switch::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      top: 2px; left: 2px;
+      transition: transform 0.3s;
+    }
+    .rag-toggle.active .rag-toggle__switch {
+      background: var(--cyan);
+    }
+    .rag-toggle.active .rag-toggle__switch::after {
+      transform: translateX(20px);
+    }
+    .rag-toggle__label {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .rag-toggle__desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.125rem;
+    }
+    .rag-sources {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.875rem;
+      padding-top: 0.875rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: none;
+    }
+    .rag-sources.show { display: flex; }
+    .rag-source {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      transition: all 0.3s;
+    }
+    .rag-source:hover { border-color: rgba(0,212,255,0.3); }
+    .rag-source.active {
+      border-color: var(--cyan);
+      background: rgba(0,212,255,0.08);
+      color: var(--cyan);
+    }
+    .rag-source__check {
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+    }
+    .rag-source.active .rag-source__check {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--bg);
+    }
 
     .text-input {
       width: 100%;
@@ -157,9 +312,9 @@
     }
     .wf-step {
       flex: 1;
-      min-width: 120px;
+      min-width: 100px;
       text-align: center;
-      padding: 0.875rem 0.5rem;
+      padding: 0.75rem 0.375rem;
       border-radius: 0.75rem;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.05);
@@ -174,12 +329,12 @@
       background: rgba(16, 185, 129, 0.08);
     }
     .wf-step__num {
-      width: 1.75rem; height: 1.75rem;
+      width: 1.625rem; height: 1.625rem;
       border-radius: 50%;
       background: rgba(255,255,255,0.08);
       color: var(--text-muted);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 700;
+      font-size: 0.6875rem; font-weight: 700;
       margin: 0 auto 0.375rem;
     }
     .wf-step.active .wf-step__num {
@@ -190,12 +345,48 @@
       background: var(--green);
       color: #fff;
     }
-    .wf-step__title { font-size: 0.75rem; font-weight: 600; }
+    .wf-step__title { font-size: 0.6875rem; font-weight: 600; }
     .wf-step__status { font-size: 0.625rem; color: var(--text-muted); margin-top: 0.25rem; }
 
     .step-work-area {
       min-height: 320px;
     }
+
+    /* 话题确认 */
+    .topic-confirm {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) { .topic-confirm { grid-template-columns: repeat(2, 1fr); } }
+    .topic-metric {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .topic-metric__value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .topic-metric__label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .topic-reason {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+    .topic-reason strong { color: var(--cyan); }
 
     /* 素材采集 */
     .materials-list {
@@ -220,7 +411,28 @@
     }
     .material-item__icon { font-size: 1.25rem; flex-shrink: 0; }
     .material-item__text { font-size: 0.875rem; color: var(--text-secondary); }
-    .material-item__source { font-size: 0.6875rem; color: var(--text-muted); margin-left: auto; flex-shrink: 0; }
+    .material-item__source {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-left: auto;
+      flex-shrink: 0;
+      padding: 0.125rem 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 0.25rem;
+    }
+    .material-item__source.rag {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--cyan);
+    }
+    .rag-header {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
 
     /* 大纲 */
     .outline-tree {
@@ -380,16 +592,88 @@
     <div class="hero__content">
       <div class="hero__badge">📝 智能撰稿</div>
       <h1 class="hero__title">让 AI 成为你的<span style="color: var(--cyan)">首席编辑</span></h1>
-      <p class="hero__subtitle">输入主题，AI 自动完成素材采集、大纲生成、初稿撰写、风格润色全流程</p>
+      <p class="hero__subtitle">选择话题、配置参数，AI 自动完成话题确认、素材采集、大纲生成、智能撰写、风格润色全流程</p>
     </div>
   </section>
 
   <section class="config-section">
     <div class="config-header">
       <h2>📝 创作配置</h2>
-      <p>选择文章类型、输入主题，AI 将为您生成专业稿件</p>
+      <p>从选题推荐选择话题或自定义输入，AI 将为您生成专业稿件</p>
     </div>
     <div class="config-form">
+      <!-- 话题选择 -->
+      <div class="form-group">
+        <div class="topic-section-header">
+          <label class="form-group__label">话题选择</label>
+          <a href="topic-recommendation.html" class="topic-link">💡 前往选题推荐获取更多 →</a>
+        </div>
+        <div class="topic-options" id="topicOptions">
+          <div class="topic-option" data-topic="digital-human">
+            <div class="topic-option__title">杭州亚运会数字人点火技术揭秘</div>
+            <div class="topic-option__meta">科技 × 体育 × AI应用</div>
+            <div class="topic-option__heat">🔥 热度 96</div>
+            <div class="topic-option__tags">
+              <span class="topic-option__tag">科技</span>
+              <span class="topic-option__tag">体育</span>
+              <span class="topic-option__tag">AI</span>
+            </div>
+          </div>
+          <div class="topic-option" data-topic="aaa-game">
+            <div class="topic-option__title">国产3A游戏崛起：文化输出新路径</div>
+            <div class="topic-option__meta">游戏 × 文化 × 出海</div>
+            <div class="topic-option__heat">🔥 热度 93</div>
+            <div class="topic-option__tags">
+              <span class="topic-option__tag">游戏</span>
+              <span class="topic-option__tag">文化</span>
+              <span class="topic-option__tag">出海</span>
+            </div>
+          </div>
+          <div class="topic-option" data-topic="iphone16">
+            <div class="topic-option__title">iPhone 16 深度评测：A18芯片性能解析</div>
+            <div class="topic-option__meta">科技 × 评测 × 消费电子</div>
+            <div class="topic-option__heat">🔥 热度 95</div>
+            <div class="topic-option__tags">
+              <span class="topic-option__tag">评测</span>
+              <span class="topic-option__tag">芯片</span>
+              <span class="topic-option__tag">苹果</span>
+            </div>
+          </div>
+          <div class="topic-option" data-topic="precooked">
+            <div class="topic-option__title">预制菜进校园引发家长集体担忧</div>
+            <div class="topic-option__meta">社会 × 健康 × 教育</div>
+            <div class="topic-option__heat">🔥 热度 92</div>
+            <div class="topic-option__tags">
+              <span class="topic-option__tag">社会</span>
+              <span class="topic-option__tag">健康</span>
+              <span class="topic-option__tag">教育</span>
+            </div>
+          </div>
+          <div class="topic-option" data-topic="ai-news">
+            <div class="topic-option__title">AI大模型在新闻生产中的落地实践</div>
+            <div class="topic-option__meta">AI × 媒体 × 技术</div>
+            <div class="topic-option__heat">🔥 热度 88</div>
+            <div class="topic-option__tags">
+              <span class="topic-option__tag">AI</span>
+              <span class="topic-option__tag">媒体</span>
+              <span class="topic-option__tag">应用</span>
+            </div>
+          </div>
+          <div class="topic-option" data-topic="special-ops">
+            <div class="topic-option__title">特种兵式旅游：年轻人的旅行新范式</div>
+            <div class="topic-option__meta">旅游 × 年轻 × 生活方式</div>
+            <div class="topic-option__heat">🔥 热度 90</div>
+            <div class="topic-option__tags">
+              <span class="topic-option__tag">旅游</span>
+              <span class="topic-option__tag">年轻</span>
+              <span class="topic-option__tag">生活方式</span>
+            </div>
+          </div>
+        </div>
+        <input type="text" class="text-input" id="customTopicInput" placeholder="或输入自定义话题...">
+      </div>
+
+      <!-- 文章类型 -->
       <div class="form-group">
         <label class="form-group__label">文章类型</label>
         <div class="type-options" id="typeOptions">
@@ -412,17 +696,45 @@
         </div>
       </div>
 
+      <!-- RAG 知识库 -->
       <div class="form-group">
-        <label class="form-group__label">文章主题</label>
-        <input type="text" class="text-input" id="topicInput" placeholder="例如：杭州亚运会开幕式亮点">
-        <div class="form-group__hint">输入核心事件或话题，AI 将自动搜集相关信息</div>
+        <label class="form-group__label">RAG 知识库</label>
+        <div class="rag-section">
+          <div class="rag-toggle" id="ragToggle">
+            <div class="rag-toggle__switch"></div>
+            <div>
+              <div class="rag-toggle__label">启用企业知识库检索</div>
+              <div class="rag-toggle__desc">关联内部知识库，为文章提供深度行业洞察与历史数据支撑</div>
+            </div>
+          </div>
+          <div class="rag-sources" id="ragSources">
+            <div class="rag-source active" data-source="industry">
+              <div class="rag-source__check">✓</div>
+              <span>行业报告库</span>
+            </div>
+            <div class="rag-source active" data-source="history">
+              <div class="rag-source__check">✓</div>
+              <span>历史稿件库</span>
+            </div>
+            <div class="rag-source" data-source="competitor">
+              <div class="rag-source__check"></div>
+              <span>竞品分析库</span>
+            </div>
+            <div class="rag-source" data-source="policy">
+              <div class="rag-source__check"></div>
+              <span>政策法规库</span>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- 目标受众 -->
       <div class="form-group">
         <label class="form-group__label">目标受众</label>
         <input type="text" class="text-input" id="audienceInput" placeholder="例如：25-45岁都市人群">
       </div>
 
+      <!-- 文章风格 -->
       <div class="form-group">
         <label class="form-group__label">文章风格</label>
         <div class="style-options" id="styleOptions">
@@ -445,28 +757,33 @@
       <div class="workflow-steps" id="workflowSteps">
         <div class="wf-step active" data-step="0">
           <div class="wf-step__num">1</div>
-          <div class="wf-step__title">素材采集</div>
+          <div class="wf-step__title">话题确认</div>
           <div class="wf-step__status" id="status0">进行中...</div>
         </div>
         <div class="wf-step" data-step="1">
           <div class="wf-step__num">2</div>
-          <div class="wf-step__title">大纲生成</div>
+          <div class="wf-step__title">素材采集</div>
           <div class="wf-step__status" id="status1">等待</div>
         </div>
         <div class="wf-step" data-step="2">
           <div class="wf-step__num">3</div>
-          <div class="wf-step__title">初稿撰写</div>
+          <div class="wf-step__title">拟定大纲</div>
           <div class="wf-step__status" id="status2">等待</div>
         </div>
         <div class="wf-step" data-step="3">
           <div class="wf-step__num">4</div>
-          <div class="wf-step__title">风格润色</div>
+          <div class="wf-step__title">智能撰写</div>
           <div class="wf-step__status" id="status3">等待</div>
         </div>
         <div class="wf-step" data-step="4">
           <div class="wf-step__num">5</div>
-          <div class="wf-step__title">成品输出</div>
+          <div class="wf-step__title">风格润色</div>
           <div class="wf-step__status" id="status4">等待</div>
+        </div>
+        <div class="wf-step" data-step="5">
+          <div class="wf-step__num">6</div>
+          <div class="wf-step__title">成品输出</div>
+          <div class="wf-step__status" id="status5">等待</div>
         </div>
       </div>
 
@@ -496,6 +813,76 @@
   </footer>
 
   <script>
+    // ====== 话题元数据 ======
+    const topicMetaDB = {
+      'digital-human': {
+        title: '杭州亚运会数字人点火技术揭秘',
+        heat: 96, audienceMatch: 94, competition: '中等', trend: '↑ 持续上升',
+        reason: '大型赛事+前沿科技双热点叠加，AI应用落地的标志性事件，兼具话题性与技术深度',
+        tags: ['科技', '体育', 'AI'],
+        ragMaterials: [
+          { icon: '📚', text: '《2023中国数字人产业发展白皮书》：市场规模达220亿元，年复合增长率超60%', source: '行业报告库' },
+          { icon: '📚', text: '阿里云实时渲染技术文档：分布式渲染架构实现16ms低延迟输出', source: '技术文档库' },
+          { icon: '📚', text: '历届大型赛事开幕式技术方案对比分析（2016-2023）', source: '历史稿件库' }
+        ]
+      },
+      'aaa-game': {
+        title: '国产3A游戏崛起：文化输出新路径',
+        heat: 93, audienceMatch: 91, competition: '较低', trend: '↑ 快速上升',
+        reason: '文化+科技双轮驱动，国产游戏出海话题热度高涨，适合深度产业分析',
+        tags: ['游戏', '文化', '出海'],
+        ragMaterials: [
+          { icon: '📚', text: '《中国游戏产业报告2023》：国产游戏海外收入达173亿美元，同比增长6%', source: '行业报告库' },
+          { icon: '📚', text: '3A游戏开发成本分析：平均研发周期3-5年，单项目投入超1亿美元', source: '竞品分析库' },
+          { icon: '📚', text: '文化输出典型案例：原神、黑神话悟空的海外传播路径与受众反馈', source: '历史稿件库' }
+        ]
+      },
+      'iphone16': {
+        title: 'iPhone 16 深度评测：A18芯片性能解析',
+        heat: 95, audienceMatch: 96, competition: '较高', trend: '→ 平稳',
+        reason: '科技数码领域年度重磅产品，搜索流量大，受众匹配度高，适合首发评测',
+        tags: ['科技', '评测', '消费电子'],
+        ragMaterials: [
+          { icon: '📚', text: '苹果A系列芯片历代性能对比（A14-A18）：制程、晶体管数量、跑分数据全记录', source: '技术文档库' },
+          { icon: '📚', text: '《全球智能手机市场Q3报告》：苹果市占率17.1%，稳居全球第二', source: '行业报告库' },
+          { icon: '📚', text: '历代iPhone首发评测传播效果分析：阅读量、互动率、转化数据', source: '历史稿件库' }
+        ]
+      },
+      'precooked': {
+        title: '预制菜进校园引发家长集体担忧',
+        heat: 92, audienceMatch: 88, competition: '中等', trend: '↑ 上升',
+        reason: '民生敏感话题，社会关注度高，适合深度调查报道，具备持续发酵潜力',
+        tags: ['社会', '健康', '教育'],
+        ragMaterials: [
+          { icon: '📚', text: '《中国预制菜产业发展报告》：2023年市场规模突破5000亿元', source: '行业报告库' },
+          { icon: '📚', text: '校园食品安全相关法规与政策文件汇编（2018-2023）', source: '政策法规库' },
+          { icon: '📚', text: '日本、欧美校园餐饮管理模式对比研究与经验借鉴', source: '竞品分析库' }
+        ]
+      },
+      'ai-news': {
+        title: 'AI大模型在新闻生产中的落地实践',
+        heat: 88, audienceMatch: 95, competition: '较低', trend: '↑ 快速上升',
+        reason: '行业应用趋势，从业者高度关注，与媒体定位高度契合，差异化竞争空间充足',
+        tags: ['AI', '媒体', '技术'],
+        ragMaterials: [
+          { icon: '📚', text: '《全球媒体AI应用调研报告》：65%新闻机构已引入AI工具，30%实现全流程覆盖', source: '行业报告库' },
+          { icon: '📚', text: '国内外主流媒体AI应用案例库：路透社、新华社、BuzzFeed、朝日新闻', source: '历史稿件库' },
+          { icon: '📚', text: '大模型内容生成质量评估标准与AI检测技术方法论文', source: '技术文档库' }
+        ]
+      },
+      'special-ops': {
+        title: '特种兵式旅游：年轻人的旅行新范式',
+        heat: 90, audienceMatch: 89, competition: '较低', trend: '→ 平稳',
+        reason: '生活方式话题，与年轻受众高度共鸣，适合视觉化内容和社交媒体传播',
+        tags: ['旅游', '年轻', '生活方式'],
+        ragMaterials: [
+          { icon: '📚', text: '《中国旅游市场复苏报告2023》：Z世代贡献35%旅游消费，人均客单价提升12%', source: '行业报告库' },
+          { icon: '📚', text: '特种兵式旅游用户画像：年龄、收入、出行频次、消费偏好与社交平台行为', source: '历史稿件库' },
+          { icon: '📚', text: '低成本旅行内容传播效果分析：抖音、小红书爆款案例拆解', source: '竞品分析库' }
+        ]
+      }
+    };
+
     // ====== 模拟文章数据 ======
     const articleDB = {
       news: {
@@ -599,23 +986,47 @@
     };
 
     // ====== 状态 ======
+    let selectedTopicKey = null;
     let selectedType = 'news';
     let selectedStyle = 'professional';
+    let ragEnabled = false;
+    let activeRagSources = new Set(['industry', 'history']);
     let currentStep = -1;
     let isRunning = false;
 
     // ====== DOM ======
+    const topicOptions = document.querySelectorAll('.topic-option');
+    const customTopicInput = document.getElementById('customTopicInput');
     const typeOptions = document.querySelectorAll('.type-option');
     const styleOptions = document.querySelectorAll('.style-option');
+    const ragToggle = document.getElementById('ragToggle');
+    const ragSources = document.getElementById('ragSources');
+    const ragSourceEls = document.querySelectorAll('.rag-source');
     const generateBtn = document.getElementById('generateBtn');
-    const topicInput = document.getElementById('topicInput');
     const audienceInput = document.getElementById('audienceInput');
     const placeholderEl = document.getElementById('workflowPlaceholder');
     const contentEl = document.getElementById('workflowContent');
     const workArea = document.getElementById('stepWorkArea');
     const progressEl = document.getElementById('overallProgress');
 
-    // ====== 配置选择 ======
+    // ====== 话题选择 ======
+    topicOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        topicOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedTopicKey = opt.dataset.topic;
+        customTopicInput.value = '';
+      });
+    });
+
+    customTopicInput.addEventListener('input', () => {
+      if (customTopicInput.value.trim()) {
+        topicOptions.forEach(o => o.classList.remove('active'));
+        selectedTopicKey = null;
+      }
+    });
+
+    // ====== 文章类型选择 ======
     typeOptions.forEach(opt => {
       opt.addEventListener('click', () => {
         typeOptions.forEach(o => o.classList.remove('active'));
@@ -624,6 +1035,7 @@
       });
     });
 
+    // ====== 风格选择 ======
     styleOptions.forEach(opt => {
       opt.addEventListener('click', () => {
         styleOptions.forEach(o => o.classList.remove('active'));
@@ -632,17 +1044,68 @@
       });
     });
 
+    // ====== RAG 开关 ======
+    ragToggle.addEventListener('click', () => {
+      ragEnabled = !ragEnabled;
+      ragToggle.classList.toggle('active', ragEnabled);
+      ragSources.classList.toggle('show', ragEnabled);
+    });
+
+    // ====== RAG 源选择 ======
+    ragSourceEls.forEach(src => {
+      src.addEventListener('click', () => {
+        const key = src.dataset.source;
+        if (activeRagSources.has(key)) {
+          activeRagSources.delete(key);
+          src.classList.remove('active');
+          src.querySelector('.rag-source__check').textContent = '';
+        } else {
+          activeRagSources.add(key);
+          src.classList.add('active');
+          src.querySelector('.rag-source__check').textContent = '✓';
+        }
+      });
+    });
+
     // ====== 开始创作 ======
     generateBtn.addEventListener('click', () => {
       if (isRunning) return;
-      const topic = topicInput.value.trim();
-      if (!topic) {
-        topicInput.style.borderColor = '#ef4444';
-        setTimeout(() => topicInput.style.borderColor = '', 1000);
+      const customTopic = customTopicInput.value.trim();
+      if (!selectedTopicKey && !customTopic) {
+        customTopicInput.style.borderColor = '#ef4444';
+        setTimeout(() => customTopicInput.style.borderColor = '', 1000);
         return;
       }
       startWorkflow();
     });
+
+    function getTopicTitle() {
+      if (selectedTopicKey && topicMetaDB[selectedTopicKey]) {
+        return topicMetaDB[selectedTopicKey].title;
+      }
+      return customTopicInput.value.trim() || '自定义话题';
+    }
+
+    function getTopicMeta() {
+      if (selectedTopicKey && topicMetaDB[selectedTopicKey]) {
+        return topicMetaDB[selectedTopicKey];
+      }
+      return {
+        heat: 85, audienceMatch: 82, competition: '未知', trend: '→ 平稳',
+        reason: '自定义话题，AI 将基于通用知识进行内容生成',
+        tags: ['自定义'],
+        ragMaterials: [
+          { icon: '📚', text: '通用行业知识库检索中...', source: '行业报告库' },
+          { icon: '📚', text: '历史稿件库相关主题检索中...', source: '历史稿件库' }
+        ]
+      };
+    }
+
+    function getRagMaterials() {
+      const meta = getTopicMeta();
+      if (!ragEnabled || activeRagSources.size === 0) return [];
+      return meta.ragMaterials || [];
+    }
 
     function startWorkflow() {
       isRunning = true;
@@ -661,7 +1124,7 @@
         if (i < currentStep) s.classList.add('completed');
         else if (i === currentStep) s.classList.add('active');
       });
-      const pct = ((currentStep + 1) / 5) * 100;
+      const pct = ((currentStep + 1) / 6) * 100;
       progressEl.style.width = pct + '%';
     }
 
@@ -669,23 +1132,79 @@
       document.getElementById('status' + step).textContent = text;
     }
 
-    // ====== 步骤0：素材采集 ======
+    // ====== 步骤0：话题确认 ======
     function runStep0() {
       currentStep = 0;
       updateStepVisuals();
-      setStatus(0, '进行中...');
+      setStatus(0, '分析中...');
+      const meta = getTopicMeta();
+
+      workArea.innerHTML = `
+        <div style="margin-bottom:1rem;color:var(--cyan);font-size:0.875rem;font-weight:600;">
+          🎯 正在分析话题价值...
+        </div>
+        <div class="topic-confirm" id="topicConfirm" style="opacity:0;transform:translateY(10px);transition:all 0.5s ease;">
+          <div class="topic-metric">
+            <div class="topic-metric__value">${meta.heat}</div>
+            <div class="topic-metric__label">话题热度</div>
+          </div>
+          <div class="topic-metric">
+            <div class="topic-metric__value">${meta.audienceMatch}%</div>
+            <div class="topic-metric__label">受众匹配度</div>
+          </div>
+          <div class="topic-metric">
+            <div class="topic-metric__value">${meta.competition}</div>
+            <div class="topic-metric__label">竞争度</div>
+          </div>
+          <div class="topic-metric">
+            <div class="topic-metric__value">${meta.trend}</div>
+            <div class="topic-metric__label">趋势走向</div>
+          </div>
+        </div>
+        <div class="topic-reason" id="topicReason" style="opacity:0;transform:translateY(10px);transition:all 0.5s ease 0.2s;">
+          <strong>💡 推荐理由：</strong>${meta.reason}
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.getElementById('topicConfirm').style.opacity = '1';
+        document.getElementById('topicConfirm').style.transform = 'translateY(0)';
+      }, 100);
+
+      setTimeout(() => {
+        document.getElementById('topicReason').style.opacity = '1';
+        document.getElementById('topicReason').style.transform = 'translateY(0)';
+        setStatus(0, '✅ 完成');
+        setTimeout(runStep1, 1000);
+      }, 800);
+    }
+
+    // ====== 步骤1：素材采集 ======
+    function runStep1() {
+      currentStep = 1;
+      updateStepVisuals();
+      setStatus(1, '采集中...');
       const article = articleDB[selectedType];
+      const ragMaterials = getRagMaterials();
+
       workArea.innerHTML = '<div class="materials-list" id="materialList"></div>';
       const list = document.getElementById('materialList');
 
       let i = 0;
+      const allMaterials = [...article.materials];
+      let ragInserted = false;
+
       function addMaterial() {
-        if (i >= article.materials.length) {
-          setStatus(0, '✅ 完成');
-          setTimeout(runStep1, 800);
+        if (i >= allMaterials.length) {
+          if (ragMaterials.length > 0 && !ragInserted) {
+            insertRagMaterials();
+            return;
+          }
+          setStatus(1, '✅ 完成');
+          setTimeout(runStep2, 800);
           return;
         }
-        const m = article.materials[i];
+        const m = allMaterials[i];
         const div = document.createElement('div');
         div.className = 'material-item';
         div.style.animationDelay = '0s';
@@ -696,16 +1215,55 @@
         `;
         list.appendChild(div);
         i++;
+
+        if (i === Math.floor(allMaterials.length / 2) && ragMaterials.length > 0) {
+          setTimeout(insertRagHeader, 300);
+          return;
+        }
         setTimeout(addMaterial, 400);
       }
+
+      function insertRagHeader() {
+        const header = document.createElement('div');
+        header.className = 'rag-header';
+        header.textContent = '📚 正在检索企业知识库...';
+        header.style.opacity = '0';
+        header.style.animation = 'fadeIn 0.5s ease forwards';
+        list.appendChild(header);
+        setTimeout(() => {
+          ragInserted = true;
+          addMaterial();
+        }, 600);
+      }
+
+      function insertRagMaterials() {
+        ragMaterials.forEach((m, idx) => {
+          setTimeout(() => {
+            const div = document.createElement('div');
+            div.className = 'material-item';
+            div.style.animationDelay = '0s';
+            div.innerHTML = `
+              <div class="material-item__icon">${m.icon}</div>
+              <div class="material-item__text">${m.text}</div>
+              <div class="material-item__source rag">${m.source}</div>
+            `;
+            list.appendChild(div);
+          }, idx * 400);
+        });
+        setTimeout(() => {
+          setStatus(1, '✅ 完成');
+          setTimeout(runStep2, 800);
+        }, ragMaterials.length * 400 + 400);
+      }
+
       addMaterial();
     }
 
-    // ====== 步骤1：大纲生成 ======
-    function runStep1() {
-      currentStep = 1;
+    // ====== 步骤2：大纲生成 ======
+    function runStep2() {
+      currentStep = 2;
       updateStepVisuals();
-      setStatus(1, '进行中...');
+      setStatus(2, '生成中...');
       const article = articleDB[selectedType];
       workArea.innerHTML = '<div class="outline-tree" id="outlineTree"></div>';
       const tree = document.getElementById('outlineTree');
@@ -713,8 +1271,8 @@
       let i = 0;
       function addItem() {
         if (i >= article.outline.length) {
-          setStatus(1, '✅ 完成');
-          setTimeout(runStep2, 800);
+          setStatus(2, '✅ 完成');
+          setTimeout(runStep3, 800);
           return;
         }
         const item = article.outline[i];
@@ -729,11 +1287,11 @@
       addItem();
     }
 
-    // ====== 步骤2：初稿撰写（打字机） ======
-    function runStep2() {
-      currentStep = 2;
+    // ====== 步骤3：智能撰写（打字机） ======
+    function runStep3() {
+      currentStep = 3;
       updateStepVisuals();
-      setStatus(2, '撰写中...');
+      setStatus(3, '撰写中...');
       const article = articleDB[selectedType];
       workArea.innerHTML = `<div class="draft-area" id="draftArea"><span class="cursor"></span></div>`;
       const area = document.getElementById('draftArea');
@@ -742,8 +1300,8 @@
 
       function typeChar() {
         if (idx >= text.length) {
-          setStatus(2, '✅ 完成');
-          setTimeout(runStep3, 1000);
+          setStatus(3, '✅ 完成');
+          setTimeout(runStep4, 1000);
           return;
         }
         const char = text[idx];
@@ -757,11 +1315,11 @@
       typeChar();
     }
 
-    // ====== 步骤3：风格润色 ======
-    function runStep3() {
-      currentStep = 3;
+    // ====== 步骤4：风格润色 ======
+    function runStep4() {
+      currentStep = 4;
       updateStepVisuals();
-      setStatus(3, '润色中...');
+      setStatus(4, '润色中...');
       const article = articleDB[selectedType];
 
       workArea.innerHTML = `
@@ -791,8 +1349,8 @@
       function typePolished() {
         if (idx >= Math.min(polishedText.length, 250)) {
           afterEl.innerHTML = highlightChanges(article.draft.substring(0, 200), article.polished.substring(0, 250));
-          setStatus(3, '✅ 完成');
-          setTimeout(runStep4, 1000);
+          setStatus(4, '✅ 完成');
+          setTimeout(runStep5, 1000);
           return;
         }
         afterEl.textContent = polishedText.substring(0, idx);
@@ -808,16 +1366,15 @@
     }
 
     function highlightChanges(original, polished) {
-      // 简单高亮差异部分
-      return polished.replace(/(完美|深远|开创性|毋庸置疑|显著|极具|无可替代|前沿|里程碑|臻|顶级|巅峰)/g,
+      return polished.replace(/(完美|深远|开创性|毋庸置疑|显著|极具|无可替代|前沿|里程碑|臻|顶级|巅峰| arguably | surrea)/g,
         '<span class="changed">$1</span>');
     }
 
-    // ====== 步骤4：成品输出 ======
-    function runStep4() {
-      currentStep = 4;
+    // ====== 步骤5：成品输出 ======
+    function runStep5() {
+      currentStep = 5;
       updateStepVisuals();
-      setStatus(4, '输出中...');
+      setStatus(5, '输出中...');
       const article = articleDB[selectedType];
       const m = article.metrics;
 
@@ -845,7 +1402,7 @@
           </div>
         </div>
       `;
-      setStatus(4, '✅ 完成');
+      setStatus(5, '✅ 完成');
       isRunning = false;
       generateBtn.disabled = false;
       generateBtn.textContent = '✨ 再次创作';
