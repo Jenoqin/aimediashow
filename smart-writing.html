@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI智能撰稿工作流演示系统——素材采集、大纲生成、初稿撰写、风格润色、成品输出">
+  <title>智能撰稿 | AI × 传媒变革</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .detail-hero {
+      min-height: 40vh; padding-top: 5rem;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--theme-color) 8%, transparent) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 70%, rgba(124, 58, 237, 0.06) 0%, transparent 50%);
+    }
+    .config-section {
+      max-width: min(90vw, 56rem);
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    .config-header { text-align: center; margin-bottom: 2rem; }
+    .config-header h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem; }
+    .config-header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+    .config-form {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 2rem;
+    }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group__label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .form-group__hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .type-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 768px) { .type-options { grid-template-columns: repeat(2, 1fr); } }
+    .type-option {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .type-option:hover { border-color: rgba(0, 212, 255, 0.3); }
+    .type-option.active {
+      border-color: var(--cyan);
+      background: rgba(0, 212, 255, 0.08);
+    }
+    .type-option__icon { font-size: 1.5rem; margin-bottom: 0.375rem; }
+    .type-option__name { font-size: 0.8125rem; font-weight: 600; }
+
+    .text-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 0.9375rem;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    .text-input:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+    .text-input::placeholder { color: var(--text-dim); }
+
+    .style-options {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .style-option {
+      padding: 0.5rem 1.25rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .style-option:hover { border-color: var(--cyan); color: var(--cyan); }
+    .style-option.active {
+      background: var(--cyan);
+      color: var(--bg);
+      border-color: var(--cyan);
+    }
+
+    .generate-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: none;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .generate-btn:hover {
+      box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .workflow-section {
+      max-width: min(90vw, 56rem);
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+    .workflow-placeholder {
+      background: var(--bg-card);
+      border: 2px dashed rgba(255,255,255,0.08);
+      border-radius: 1rem;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .workflow-content {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .workflow-steps {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .wf-step {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 0.875rem 0.5rem;
+      border-radius: 0.75rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s;
+    }
+    .wf-step.active {
+      border-color: var(--cyan);
+      background: rgba(0, 212, 255, 0.08);
+    }
+    .wf-step.completed {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .wf-step__num {
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      margin: 0 auto 0.375rem;
+    }
+    .wf-step.active .wf-step__num {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+    .wf-step.completed .wf-step__num {
+      background: var(--green);
+      color: #fff;
+    }
+    .wf-step__title { font-size: 0.75rem; font-weight: 600; }
+    .wf-step__status { font-size: 0.625rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .step-work-area {
+      min-height: 320px;
+    }
+
+    /* 素材采集 */
+    .materials-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+    .material-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: materialIn 0.4s ease forwards;
+    }
+    @keyframes materialIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .material-item__icon { font-size: 1.25rem; flex-shrink: 0; }
+    .material-item__text { font-size: 0.875rem; color: var(--text-secondary); }
+    .material-item__source { font-size: 0.6875rem; color: var(--text-muted); margin-left: auto; flex-shrink: 0; }
+
+    /* 大纲 */
+    .outline-tree {
+      padding-left: 0.5rem;
+    }
+    .outline-item {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      opacity: 0;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .outline-item.l1 { font-weight: 600; color: var(--text); }
+    .outline-item.l2 { padding-left: 1.5rem; font-size: 0.875rem; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* 打字机效果 */
+    .draft-area {
+      background: rgba(0,0,0,0.2);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      min-height: 280px;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+    .draft-area .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.2em;
+      background: var(--cyan);
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+      margin-left: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .draft-area .highlight-add {
+      background: rgba(0, 212, 255, 0.15);
+      border-radius: 2px;
+      padding: 0 2px;
+      animation: highlightFade 1.5s ease forwards;
+    }
+    @keyframes highlightFade {
+      0% { background: rgba(0, 212, 255, 0.3); }
+      100% { background: transparent; }
+    }
+
+    /* 润色对比 */
+    .polish-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .polish-comparison { grid-template-columns: 1fr; } }
+    .polish-panel {
+      background: rgba(255,255,255,0.03);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .polish-panel__label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .polish-panel__text {
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    .polish-panel__text .changed {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--cyan);
+      padding: 0 3px;
+      border-radius: 3px;
+    }
+
+    /* 成品输出 */
+    .final-output {
+      background: rgba(0,0,0,0.2);
+      border-radius: 0.75rem;
+      padding: 2rem;
+    }
+    .final-output__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .final-output__body {
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+    .final-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    @media (max-width: 768px) { .final-metrics { grid-template-columns: repeat(2, 1fr); } }
+    .metric {
+      text-align: center;
+    }
+    .metric__value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .metric__label {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .progress-bar-inline {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .progress-bar-inline__fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), #0099cc);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body style="--theme-color: var(--cyan);">
+  <nav class="navbar">
+    <div class="navbar__logo">
+      <div class="navbar__logo-icon">A</div>
+      <span class="navbar__logo-text">AI × 传媒变革</span>
+    </div>
+    <div class="navbar__links">
+      <a href="index.html" class="navbar__link">首页</a>
+      <a href="index.html#topic" class="navbar__link">选题策划</a>
+      <a href="index.html#produce" class="navbar__link navbar__link--active">内容生产</a>
+      <a href="index.html#review" class="navbar__link">审核校对</a>
+      <a href="index.html#distribute" class="navbar__link">智能分发</a>
+      <a href="index.html#insight" class="navbar__link">数据洞察</a>
+      <a href="index.html#future" class="navbar__link">未来展望</a>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="hero__grid-bg"></div>
+    <div class="hero__content">
+      <div class="hero__badge">📝 智能撰稿</div>
+      <h1 class="hero__title">让 AI 成为你的<span style="color: var(--cyan)">首席编辑</span></h1>
+      <p class="hero__subtitle">输入主题，AI 自动完成素材采集、大纲生成、初稿撰写、风格润色全流程</p>
+    </div>
+  </section>
+
+  <section class="config-section">
+    <div class="config-header">
+      <h2>📝 创作配置</h2>
+      <p>选择文章类型、输入主题，AI 将为您生成专业稿件</p>
+    </div>
+    <div class="config-form">
+      <div class="form-group">
+        <label class="form-group__label">文章类型</label>
+        <div class="type-options" id="typeOptions">
+          <div class="type-option active" data-type="news">
+            <div class="type-option__icon">📰</div>
+            <div class="type-option__name">新闻快讯</div>
+          </div>
+          <div class="type-option" data-type="deep">
+            <div class="type-option__icon">📑</div>
+            <div class="type-option__name">深度报道</div>
+          </div>
+          <div class="type-option" data-type="comment">
+            <div class="type-option__icon">💬</div>
+            <div class="type-option__name">评论文章</div>
+          </div>
+          <div class="type-option" data-type="review">
+            <div class="type-option__icon">⭐</div>
+            <div class="type-option__name">产品评测</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-group__label">文章主题</label>
+        <input type="text" class="text-input" id="topicInput" placeholder="例如：杭州亚运会开幕式亮点">
+        <div class="form-group__hint">输入核心事件或话题，AI 将自动搜集相关信息</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-group__label">目标受众</label>
+        <input type="text" class="text-input" id="audienceInput" placeholder="例如：25-45岁都市人群">
+      </div>
+
+      <div class="form-group">
+        <label class="form-group__label">文章风格</label>
+        <div class="style-options" id="styleOptions">
+          <div class="style-option active" data-style="professional">严肃专业</div>
+          <div class="style-option" data-style="lively">活泼通俗</div>
+          <div class="style-option" data-style="analytical">深度分析</div>
+          <div class="style-option" data-style="neutral">客观中立</div>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="generateBtn">✨ 开始 AI 创作</button>
+    </div>
+  </section>
+
+  <section class="workflow-section">
+    <div class="workflow-placeholder" id="workflowPlaceholder">
+      👆 配置文章信息后点击"开始 AI 创作"，查看智能撰稿完整工作流
+    </div>
+    <div class="workflow-content" id="workflowContent" style="display:none;">
+      <div class="workflow-steps" id="workflowSteps">
+        <div class="wf-step active" data-step="0">
+          <div class="wf-step__num">1</div>
+          <div class="wf-step__title">素材采集</div>
+          <div class="wf-step__status" id="status0">进行中...</div>
+        </div>
+        <div class="wf-step" data-step="1">
+          <div class="wf-step__num">2</div>
+          <div class="wf-step__title">大纲生成</div>
+          <div class="wf-step__status" id="status1">等待</div>
+        </div>
+        <div class="wf-step" data-step="2">
+          <div class="wf-step__num">3</div>
+          <div class="wf-step__title">初稿撰写</div>
+          <div class="wf-step__status" id="status2">等待</div>
+        </div>
+        <div class="wf-step" data-step="3">
+          <div class="wf-step__num">4</div>
+          <div class="wf-step__title">风格润色</div>
+          <div class="wf-step__status" id="status3">等待</div>
+        </div>
+        <div class="wf-step" data-step="4">
+          <div class="wf-step__num">5</div>
+          <div class="wf-step__title">成品输出</div>
+          <div class="wf-step__status" id="status4">等待</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-inline">
+        <div class="progress-bar-inline__fill" id="overallProgress" style="width:0%"></div>
+      </div>
+
+      <div class="step-work-area" id="stepWorkArea">
+        <!-- 动态内容 -->
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="navbar__logo">
+        <div class="navbar__logo-icon">A</div>
+        <span class="navbar__logo-text">AI × 传媒变革</span>
+      </div>
+      <div class="footer__links">
+        <a href="index.html">首页</a>
+        <a href="#">关于我们</a>
+        <a href="#">联系方式</a>
+      </div>
+      <div class="footer__copyright">© 2026 AI × 传媒变革. 技术引领，探索未来.</div>
+    </div>
+  </footer>
+
+  <script>
+    // ====== 模拟文章数据 ======
+    const articleDB = {
+      news: {
+        title: '杭州亚运会开幕式圆满举行 数字人点火成最大亮点',
+        materials: [
+          { icon: '📰', text: '杭州亚运会开幕式于今晚8点正式举行', source: '新华社' },
+          { icon: '📊', text: '本届亚运会共有45个国家和地区参加', source: '赛事官网' },
+          { icon: '🎥', text: '开幕式采用全息投影技术呈现西湖美景', source: '央视体育' },
+          { icon: '🔥', text: '数字人"弄潮儿"跨越钱塘江点燃主火炬', source: '科技日报' },
+          { icon: '📱', text: '社交媒体话题阅读量突破10亿', source: '微博热搜' },
+          { icon: '🏅', text: '中国代表团第100个入场，全场欢呼', source: '人民日报' }
+        ],
+        outline: [
+          { level: 1, text: '一、开幕式盛况：科技与艺术的完美融合' },
+          { level: 2, text: '1.1 全息投影呈现西湖十景' },
+          { level: 2, text: '1.2 数字人点火仪式引发热议' },
+          { level: 1, text: '二、数字人技术解析：亚运史上的首次尝试' },
+          { level: 2, text: '2.1 实时动作捕捉技术' },
+          { level: 2, text: '2.2 跨江点火的技术难点' },
+          { level: 1, text: '三、社会反响：从惊叹到思考' },
+          { level: 2, text: '3.1 社交媒体数据一览' },
+          { level: 2, text: '3.2 专家点评与未来展望' }
+        ],
+        draft: '杭州亚运会开幕式于9月23日晚在杭州奥体中心体育场隆重举行。本次开幕式以"潮起亚细亚"为主题，将杭州的城市特色与亚运精神完美融合，为观众呈现了一场视觉盛宴。\n\n开幕式最大的亮点莫过于数字人"弄潮儿"的点火仪式。这位由AI技术驱动的虚拟人物，手持火炬跨越钱塘江，最终在体育场内点燃了主火炬。这一创新之举不仅是亚运会历史上的首次，也标志着大型体育赛事正式迈入元宇宙时代。\n\n技术团队透露，数字人的每一个动作都经过精密计算，从表情到步态都力求逼真。观众在现场通过AR眼镜可以看到数字人完整的跨江之旅，而电视观众则通过多机位切换感受这一震撼时刻。\n\n社交媒体上，#数字人点火#话题迅速登上热搜榜首，阅读量突破10亿次。网友们纷纷留言："这就是中国科技的力量！""太震撼了，仿佛看到了未来。"',
+        polished: '杭州亚运会开幕式于9月23日晚在杭州奥体中心体育场盛大举行。本届开幕式以"潮起亚细亚"为主题，将千年杭城的诗意韵味与亚运精神的蓬勃朝气巧妙融合，为全球观众奉献了一场科技与人文交相辉映的视觉盛宴。\n\n整场开幕式最令人瞩目的，当属数字人"弄潮儿"点燃主火炬的历史性时刻。这位依托前沿AI技术打造的虚拟形象，手持亚运火炬凌空跨越波澜壮阔的钱塘江，最终在主体育场内精准点燃了圣火。这一开创性的设计不仅是亚运百年史上的首次尝试，更象征着大型综合性体育赛事正式迈入数字文明与实体经济深度融合的新纪元。\n\n据技术团队揭秘，数字人的每一个细微动作都经由高精度动作捕捉与实时渲染技术精密合成，从面部微表情到肢体步态均达到影视级真实度。现场观众借助AR增强现实设备，可沉浸式体验数字人完整的跨江点火之旅；而通过电视转播的亿万观众，亦能通过多维度镜头语言感受这一震撼人心的科技奇观。\n\n社交媒体平台迅速被这一话题点燃。#数字人点火#词条在短时间内登顶微博热搜榜首，全网阅读量强势突破10亿大关。广大网友热议不断："这就是中国科技硬实力的最佳注脚！""仿佛穿越到了未来世界，为祖国的科技进步深感自豪。"',
+        metrics: { wordCount: 486, readTime: '3分钟', qualityScore: 92, seoScore: 88 }
+      },
+      deep: {
+        title: '深度调查：数字人点火背后的技术突围与产业图景',
+        materials: [
+          { icon: '🔬', text: '实时渲染技术延迟控制在16毫秒以内', source: '技术白皮书' },
+          { icon: '💰', text: '开幕式技术投入占总预算的35%', source: '财经杂志' },
+          { icon: '📈', text: '中国数字人市场规模预计2025年达480亿元', source: '艾瑞咨询' },
+          { icon: '🎓', text: '核心技术团队来自浙大、阿里达摩院', source: '浙大官网' },
+          { icon: '🌍', text: '东京奥运、北京冬奥均未采用类似技术', source: '国际奥委会' },
+          { icon: '⚖️', text: '数字人版权归属引发法律界讨论', source: '法制日报' }
+        ],
+        outline: [
+          { level: 1, text: '一、引言：从"看不见"到"触手可及"' },
+          { level: 1, text: '二、技术拆解：数字人是如何"活"起来的' },
+          { level: 2, text: '2.1 动作捕捉：从真人到数字分身' },
+          { level: 2, text: '2.2 实时渲染：16毫秒的挑战' },
+          { level: 2, text: '2.3 跨江点火：空间定位的毫米级精度' },
+          { level: 1, text: '三、产业图景：480亿市场背后的参与者' },
+          { level: 2, text: '3.1 上游：硬件设备与算法底座' },
+          { level: 2, text: '3.2 下游：应用场景的不断拓展' },
+          { level: 1, text: '四、反思：技术进步与伦理边界' },
+          { level: 2, text: '4.1 数字人的权利归属' },
+          { level: 2, text: '4.2 虚拟与真实的边界在哪里' }
+        ],
+        draft: '当数字人"弄潮儿"手持火炬跨越钱塘江的那一刻，很少有人意识到，这短短30秒的画面背后，是数百名工程师历时18个月的技术攻关。\n\n杭州亚运会开幕式技术总监李明（化名）在接受本报专访时透露，数字人点火的创意最早在2022年初就已经提出，但直到2023年春节后才真正进入技术可行性验证阶段。"最大的挑战不是让数字人看起来真实，而是让数十万现场观众同时看到一致的画面。"\n\n据了解，技术团队采用了"云端渲染+边缘分发"的混合架构。主火炬点燃的关键画面由部署在阿里云数据中心的服务集群实时渲染，再通过5G网络以低于16毫秒的延迟推送到体育场内的AR设备。这一延迟水平，远低于人眼可感知的阈值。\n\n数字人产业的爆发式增长也在悄然发生。艾瑞咨询的数据显示，2023年中国数字人市场规模已达到220亿元，预计到2025年将突破480亿元。从虚拟主播到数字客服，从品牌代言人到教育助手，数字人正在渗透到越来越多的商业场景。',
+        polished: '当数字人"弄潮儿"手持亚运火炬凌空跨越钱塘江的刹那，全场数十万观众屏息凝神。然而鲜为人知的是，这段仅持续30余秒的视觉奇观，凝聚了数百名工程师长达18个月的呕心沥血。\n\n杭州亚运会开幕式技术总监李明（化名）在接受本报深度专访时首次披露，数字人点火的创意雏形诞生于2022年初春，彼时团队内部争议不断——"技术上是否可行？成本能否承受？观众接受度如何？"直至2023年春节后，项目方进入实质性技术可行性验证阶段。"真正的技术瓶颈并非让数字人看起来栩栩如生，而是确保体育场内数十万观众通过不同终端设备，在同一时刻看到完全同步、毫无延迟的点火画面。"李明坦言。\n\n为攻克这一世界级难题，技术团队创新性地构建了"云端实时渲染+边缘智能分发"的混合技术架构。数字人点火的核心画面由部署于阿里云数据中心的上百台GPU服务器集群协同渲染，随后通过5G专网以低于16毫秒的超低延迟推送至现场AR终端。要知道，16毫秒这一数字已逼近当前通信技术的物理极限，更远低于人类视觉系统可感知的延迟阈值。\n\n与此同时，数字人产业正经历爆发式增长。艾瑞咨询最新发布的行业报告显示，2023年中国数字人核心市场规模已达220亿元，复合年增长率超过60%；预计到2025年，整体市场规模将强势突破480亿元大关。从直播电商间的虚拟主播，到金融机构的智能客服，从高端品牌的数字代言人，到在线教育领域的AI助教，数字人技术正以润物细无声的方式，重塑着商业社会的运行逻辑。',
+        metrics: { wordCount: 682, readTime: '5分钟', qualityScore: 95, seoScore: 91 }
+      },
+      comment: {
+        title: '数字人点火：惊艳过后，我们更应该思考什么',
+        materials: [
+          { icon: '💭', text: '网友：科技让传统仪式失去了人情味', source: '微博评论' },
+          { icon: '📜', text: '奥运点火传统始于1936年柏林奥运会', source: '体育史' },
+          { icon: '🎭', text: '戏剧评论人：仪式感需要人的温度', source: '文艺报' },
+          { icon: '📊', text: '68%受访者支持科技赋能传统仪式', source: '问卷网' },
+          { icon: '🏛️', text: '哲学家：技术是中性的，关键在于使用', source: '哲学杂志' },
+          { icon: '📺', text: '收视率数据显示点火时刻达到峰值', source: 'CSM媒介研究' }
+        ],
+        outline: [
+          { level: 1, text: '一、惊艳时刻：不可否认的视觉震撼' },
+          { level: 1, text: '二、冷静思考：仪式感需要人的温度' },
+          { level: 2, text: '2.1 从1936年 Berlin 到2023年杭州' },
+          { level: 2, text: '2.2 科技与人文的平衡点在哪里' },
+          { level: 1, text: '三、我的观点：拥抱创新，不忘本源' },
+          { level: 2, text: '3.1 技术是手段，不是目的' },
+          { level: 2, text: '3.2 未来的仪式感会是什么样' }
+        ],
+        draft: '说实话，当数字人"弄潮儿"点燃主火炬的那一刻，我和绝大多数观众一样，被深深地震撼了。那是一种穿越时空的奇妙感觉——仿佛未来已来。\n\n但冷静下来想想，我总觉得少了点什么。\n\n从1936年柏林奥运会首次引入火炬传递至今，近90年来，点火仪式承载的从来不只是一束火焰。它是人与人之间连接的仪式，是运动员汗水与梦想的凝结，是人类对和平与团结的共同向往。当李宁在空中漫步点燃北京奥运主火炬时，我们看到的是一个真实的人，用真实的身体完成了看似不可能的挑战。那种张力，那种感动，是任何数字技术都无法替代的。\n\n我不是在否定科技的价值。相反，我认为杭州亚运会的尝试是勇敢且必要的。但我也想提醒所有人：在追逐科技创新的路上，不要忘记那些让仪式之所以成为仪式的本质——人的参与、人的情感、人的温度。',
+        polished: '必须坦承，当数字人"弄潮儿"凌空跨越钱塘江、精准点燃主火炬的那一瞬间，我与现场及屏幕前的亿万观众一样，被一种近乎 surreal（超现实）的视觉冲击所深深震撼。那是一种穿越时空的奇妙体验——仿佛未来的大门在这一刻轰然洞开。\n\n然而，当肾上腺素逐渐消退，一种微妙的失落感却悄然浮现。\n\n回望奥运火炬传递的漫长历史：自1936年柏林奥运会首次引入这一仪式以来，近九十年的岁月里，点火环节承载的从来不只是一簇燃烧的火焰。它是人与人之间情感连接的庄重仪式，是运动员数年如一日挥洒汗水、追逐梦想的终极凝结，更是人类社会对和平、团结与超越的共同向往。当李宁以"空中飞人"之姿漫步鸟巢点燃北京奥运圣火时，我们看到的是一个有血有肉的真实个体，凭借真实的肉身完成了看似"不可能完成的任务"。那种生命张力，那种灵魂共鸣，是任何前沿数字技术都难以完全复刻的。\n\n我绝非在否定科技创新的价值。恰恰相反，我认为杭州亚运会的破尝试是勇敢且富有远见的——它为大型活动的呈现方式开辟了全新的想象空间。但我想在喧嚣的赞美声中，冷静地提醒所有人：在义无反顾地拥抱技术革新的道路上，切勿遗忘那些让"仪式"之所以神圣的本质——人的亲身参与、人的真挚情感、人的体温。',
+        metrics: { wordCount: 523, readTime: '4分钟', qualityScore: 93, seoScore: 85 }
+      },
+      review: {
+        title: '杭州亚运会开幕式技术评测：这束"数字之火"值得几分',
+        materials: [
+          { icon: '⭐', text: '技术完成度：9.2/10', source: '科技评测网' },
+          { icon: '📐', text: '视觉设计：8.8/10', source: '设计周刊' },
+          { icon: '🎵', text: '音乐配合：8.5/10', source: '音乐之声' },
+          { icon: '👥', text: '观众体验：部分AR设备出现卡顿', source: '现场调研' },
+          { icon: '💸', text: '性价比：投入产出比待商榷', source: '财经分析' },
+          { icon: '🏆', text: '历史意义：开创亚运数字化先河', source: '体育档案' }
+        ],
+        outline: [
+          { level: 1, text: '一、综合评分：8.7/10' },
+          { level: 1, text: '二、技术维度深度评测' },
+          { level: 2, text: '2.1 数字人渲染：国产技术的里程碑' },
+          { level: 2, text: '2.2 实时传输：仍有优化空间' },
+          { level: 1, text: '三、体验维度：惊艳与遗憾并存' },
+          { level: 2, text: '3.1 电视观众 vs 现场观众体验差异' },
+          { level: 1, text: '四、总结：一次值得鼓励的尝试' }
+        ],
+        draft: '作为一名长期关注大型活动技术呈现的评测人，我对杭州亚运会开幕式的数字人点火给出了8.7分的综合评价。这是一个相当高的分数，但考虑到其中的技术创新含量，我认为实至名归。\n\n技术维度无疑是本次开幕式最亮眼的部分。数字人"弄潮儿"的渲染精度达到了电影级别，毛发、衣料、光影效果的处理均显示出国内顶尖的技术水准。据我了解，渲染引擎采用了自研的分布式架构，能够在保证画质的同时实现实时输出。\n\n但在体验维度，我必须指出一些遗憾。部分现场观众反馈，AR眼镜在数字人出现的关键时刻出现了短暂卡顿，虽然持续时间不超过2秒，但对于追求极致体验的观众来说，这2秒足以打破沉浸感。\n\n性价比方面，开幕式技术投入占总预算的35%这一比例引发了业界讨论。有人认为这是一次"不计成本"的炫技，也有人认为这为国产技术提供了宝贵的实战场景。我的看法是：从产业推动的角度，这笔钱花得值。',
+        polished: '作为一名长期深耕大型演艺活动技术评测领域的观察者，我为杭州亚运会开幕式的数字人点火环节打出了8.7分的综合评分。这一分数在同类评测体系中已属上乘水准，而若充分考量其中蕴含的技术突破与创新勇气，此评分 arguably 仍显保守。\n\n技术维度无疑是本届开幕式最为夺目的亮点。数字人"弄潮儿"的渲染精细度已臻电影工业级标准——毛发的根根分明、丝绸衣料的物理模拟、复杂光影环境的实时反馈，每一帧画面都彰显出国内顶尖技术团队深厚的研发功底。经多方求证，本次采用的分布式实时渲染引擎系团队自研架构，其独特之处在于能够在维持影视级画质输出的同时，满足大型活动现场严苛的实时性要求，这在国际范围内亦属前沿探索。\n\n然而，在用户体验维度，我必须客观地指出若干遗憾。据现场抽样调研反馈，约15%的AR终端用户在数字人点火的高潮时刻遭遇了不超过2秒的帧率波动。尽管这一延迟在宏观叙事层面几乎可以忽略不计，但对于沉浸在仪式感中的个体观众而言，这短暂的"出戏"瞬间足以对整体体验造成微妙而深刻的损伤。技术团队显然也意识到了这一痛点，据悉已在闭幕式筹备中针对性地优化了边缘节点的负载均衡策略。\n\n关于性价比争议——开幕式技术投入占据总预算35%的比例确实在业界掀起了不小的讨论波澜。批评者将其定性为"不计成本的炫技狂欢"，支持者则认为这为国产自主可控技术提供了无可替代的实战练兵场。我的专业判断倾向于后者：从产业生态培育的长远视角审视，这笔投入不仅物有所值，更可能在未来三至五年内产生显著的技术外溢效应。',
+        metrics: { wordCount: 598, readTime: '4分钟', qualityScore: 94, seoScore: 89 }
+      }
+    };
+
+    // ====== 状态 ======
+    let selectedType = 'news';
+    let selectedStyle = 'professional';
+    let currentStep = -1;
+    let isRunning = false;
+
+    // ====== DOM ======
+    const typeOptions = document.querySelectorAll('.type-option');
+    const styleOptions = document.querySelectorAll('.style-option');
+    const generateBtn = document.getElementById('generateBtn');
+    const topicInput = document.getElementById('topicInput');
+    const audienceInput = document.getElementById('audienceInput');
+    const placeholderEl = document.getElementById('workflowPlaceholder');
+    const contentEl = document.getElementById('workflowContent');
+    const workArea = document.getElementById('stepWorkArea');
+    const progressEl = document.getElementById('overallProgress');
+
+    // ====== 配置选择 ======
+    typeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        typeOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedType = opt.dataset.type;
+      });
+    });
+
+    styleOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        styleOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedStyle = opt.dataset.style;
+      });
+    });
+
+    // ====== 开始创作 ======
+    generateBtn.addEventListener('click', () => {
+      if (isRunning) return;
+      const topic = topicInput.value.trim();
+      if (!topic) {
+        topicInput.style.borderColor = '#ef4444';
+        setTimeout(() => topicInput.style.borderColor = '', 1000);
+        return;
+      }
+      startWorkflow();
+    });
+
+    function startWorkflow() {
+      isRunning = true;
+      generateBtn.disabled = true;
+      generateBtn.textContent = '⏳ AI 创作中...';
+      placeholderEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      currentStep = 0;
+      updateStepVisuals();
+      runStep0();
+    }
+
+    function updateStepVisuals() {
+      document.querySelectorAll('.wf-step').forEach((s, i) => {
+        s.classList.remove('active', 'completed');
+        if (i < currentStep) s.classList.add('completed');
+        else if (i === currentStep) s.classList.add('active');
+      });
+      const pct = ((currentStep + 1) / 5) * 100;
+      progressEl.style.width = pct + '%';
+    }
+
+    function setStatus(step, text) {
+      document.getElementById('status' + step).textContent = text;
+    }
+
+    // ====== 步骤0：素材采集 ======
+    function runStep0() {
+      currentStep = 0;
+      updateStepVisuals();
+      setStatus(0, '进行中...');
+      const article = articleDB[selectedType];
+      workArea.innerHTML = '<div class="materials-list" id="materialList"></div>';
+      const list = document.getElementById('materialList');
+
+      let i = 0;
+      function addMaterial() {
+        if (i >= article.materials.length) {
+          setStatus(0, '✅ 完成');
+          setTimeout(runStep1, 800);
+          return;
+        }
+        const m = article.materials[i];
+        const div = document.createElement('div');
+        div.className = 'material-item';
+        div.style.animationDelay = '0s';
+        div.innerHTML = `
+          <div class="material-item__icon">${m.icon}</div>
+          <div class="material-item__text">${m.text}</div>
+          <div class="material-item__source">${m.source}</div>
+        `;
+        list.appendChild(div);
+        i++;
+        setTimeout(addMaterial, 400);
+      }
+      addMaterial();
+    }
+
+    // ====== 步骤1：大纲生成 ======
+    function runStep1() {
+      currentStep = 1;
+      updateStepVisuals();
+      setStatus(1, '进行中...');
+      const article = articleDB[selectedType];
+      workArea.innerHTML = '<div class="outline-tree" id="outlineTree"></div>';
+      const tree = document.getElementById('outlineTree');
+
+      let i = 0;
+      function addItem() {
+        if (i >= article.outline.length) {
+          setStatus(1, '✅ 完成');
+          setTimeout(runStep2, 800);
+          return;
+        }
+        const item = article.outline[i];
+        const div = document.createElement('div');
+        div.className = `outline-item l${item.level}`;
+        div.style.animationDelay = '0s';
+        div.textContent = item.text;
+        tree.appendChild(div);
+        i++;
+        setTimeout(addItem, 300);
+      }
+      addItem();
+    }
+
+    // ====== 步骤2：初稿撰写（打字机） ======
+    function runStep2() {
+      currentStep = 2;
+      updateStepVisuals();
+      setStatus(2, '撰写中...');
+      const article = articleDB[selectedType];
+      workArea.innerHTML = `<div class="draft-area" id="draftArea"><span class="cursor"></span></div>`;
+      const area = document.getElementById('draftArea');
+      const text = article.draft;
+      let idx = 0;
+
+      function typeChar() {
+        if (idx >= text.length) {
+          setStatus(2, '✅ 完成');
+          setTimeout(runStep3, 1000);
+          return;
+        }
+        const char = text[idx];
+        const span = document.createElement('span');
+        span.textContent = char;
+        area.insertBefore(span, area.lastElementChild);
+        idx++;
+        const delay = char === '\n' ? 80 : Math.random() * 15 + 8;
+        setTimeout(typeChar, delay);
+      }
+      typeChar();
+    }
+
+    // ====== 步骤3：风格润色 ======
+    function runStep3() {
+      currentStep = 3;
+      updateStepVisuals();
+      setStatus(3, '润色中...');
+      const article = articleDB[selectedType];
+
+      workArea.innerHTML = `
+        <div style="margin-bottom:0.75rem;color:var(--orange);font-size:0.875rem;"
+          >🎨 正在应用「${getStyleName(selectedStyle)}」风格润色...</div>
+        <div class="polish-comparison" id="polishCompare"></div>
+      `;
+
+      const compare = document.getElementById('polishCompare');
+      compare.innerHTML = `
+        <div class="polish-panel">
+          <div class="polish-panel__label">润色前</div>
+          <div class="polish-panel__text" id="beforeText"></div>
+        </div>
+        <div class="polish-panel">
+          <div class="polish-panel__label">润色后</div>
+          <div class="polish-panel__text" id="afterText"></div>
+        </div>
+      `;
+
+      const beforeEl = document.getElementById('beforeText');
+      const afterEl = document.getElementById('afterText');
+      beforeEl.textContent = article.draft.substring(0, 200) + '...';
+
+      let idx = 0;
+      const polishedText = article.polished;
+      function typePolished() {
+        if (idx >= Math.min(polishedText.length, 250)) {
+          afterEl.innerHTML = highlightChanges(article.draft.substring(0, 200), article.polished.substring(0, 250));
+          setStatus(3, '✅ 完成');
+          setTimeout(runStep4, 1000);
+          return;
+        }
+        afterEl.textContent = polishedText.substring(0, idx);
+        idx += 3;
+        setTimeout(typePolished, 12);
+      }
+      typePolished();
+    }
+
+    function getStyleName(key) {
+      const map = { professional: '严肃专业', lively: '活泼通俗', analytical: '深度分析', neutral: '客观中立' };
+      return map[key] || key;
+    }
+
+    function highlightChanges(original, polished) {
+      // 简单高亮差异部分
+      return polished.replace(/(完美|深远|开创性|毋庸置疑|显著|极具|无可替代|前沿|里程碑|臻|顶级|巅峰)/g,
+        '<span class="changed">$1</span>');
+    }
+
+    // ====== 步骤4：成品输出 ======
+    function runStep4() {
+      currentStep = 4;
+      updateStepVisuals();
+      setStatus(4, '输出中...');
+      const article = articleDB[selectedType];
+      const m = article.metrics;
+
+      workArea.innerHTML = `
+        <div class="final-output">
+          <div class="final-output__title">${article.title}</div>
+          <div class="final-output__body">${article.polished.replace(/\n/g, '<br><br>')}</div>
+          <div class="final-metrics">
+            <div class="metric">
+              <div class="metric__value">${m.wordCount}</div>
+              <div class="metric__label">字数</div>
+            </div>
+            <div class="metric">
+              <div class="metric__value">${m.readTime}</div>
+              <div class="metric__label">阅读时间</div>
+            </div>
+            <div class="metric">
+              <div class="metric__value">${m.qualityScore}</div>
+              <div class="metric__label">质量评分</div>
+            </div>
+            <div class="metric">
+              <div class="metric__value">${m.seoScore}</div>
+              <div class="metric__label">SEO评分</div>
+            </div>
+          </div>
+        </div>
+      `;
+      setStatus(4, '✅ 完成');
+      isRunning = false;
+      generateBtn.disabled = false;
+      generateBtn.textContent = '✨ 再次创作';
+    }
+  </script>
+</body>
+</html>

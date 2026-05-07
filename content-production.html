@@ -24,6 +24,48 @@
     .detail-highlight { background: color-mix(in srgb, var(--theme-color) 10%, transparent); border: 1px solid color-mix(in srgb, var(--theme-color) 20%, transparent); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin: 1rem 0; }
     .detail-highlight strong { color: var(--theme-color); font-size: 1.5rem; display: block; margin-bottom: 0.25rem; }
     .detail-highlight span { color: var(--text-secondary); font-size: 0.8125rem; }
+    .sub-page-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 768px) { .sub-page-cards { grid-template-columns: 1fr; } }
+    .sub-page-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .sub-page-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(6, 182, 212, 0.3);
+      box-shadow: 0 8px 32px rgba(6, 182, 212, 0.1);
+    }
+    .sub-page-card__icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .sub-page-card__title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .sub-page-card__desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; }
+    .sub-page-card__cta {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 2rem;
+      font-size: 0.8125rem;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--cyan);
+      transition: all 0.3s;
+    }
+    .sub-page-card:hover .sub-page-card__cta {
+      background: var(--cyan);
+      color: #fff;
+    }
   </style>
 </head>
 <body style="--theme-color: var(--cyan);">
@@ -55,48 +97,39 @@
   <main class="detail-content">
     <a href="index.html" class="detail-back">← 返回首页</a>
 
-    <article class="detail-section" id="smart-writing">
-      <h3>场景一：智能撰稿</h3>
-      <p>基于大语言模型的新闻稿件自动生成技术，正在重新定义"写稿"这件事。AI 不仅能快速产出初稿，还能根据媒体风格调性、目标受众和发布平台进行针对性优化。</p>
+    <div class="sub-page-cards">
+      <a href="smart-writing.html" class="sub-page-card">
+        <div class="sub-page-card__icon">📝</div>
+        <div class="sub-page-card__title">智能撰稿</div>
+        <div class="sub-page-card__desc">基于大模型的新闻稿件自动生成，支持多种文体和风格，AI 工作流演示系统</div>
+        <div class="sub-page-card__cta">进入演示 →</div>
+      </a>
+      <a href="multimedia-generation.html" class="sub-page-card">
+        <div class="sub-page-card__icon">🎬</div>
+        <div class="sub-page-card__title">多媒体生成</div>
+        <div class="sub-page-card__desc">文章自动转视频、AI 配图、信息图一键生成，多形态内容生产</div>
+        <div class="sub-page-card__cta">进入演示 →</div>
+      </a>
+      <a href="multilingual-adaptation.html" class="sub-page-card">
+        <div class="sub-page-card__icon">🌐</div>
+        <div class="sub-page-card__title">多语言适配</div>
+        <div class="sub-page-card__desc">一键翻译多语种版本，保持语义准确与风格统一，全球化传播</div>
+        <div class="sub-page-card__cta">进入演示 →</div>
+      </a>
+    </div>
+
+    <article class="detail-section">
+      <h3>AI 内容生产的核心能力</h3>
+      <p>传统的内容生产依赖大量人工劳动，从资料搜集、稿件撰写到多媒体制作，每个环节都耗时耗力。AI 驱动的内容生产系统正在重构这一流程，让媒体机构能够以更低的成本、更快的速度产出更高质量的内容。</p>
       <ul>
-        <li><strong>初稿秒级生成</strong>：输入核心事实和关键数据，AI 在数十秒内生成结构完整、逻辑清晰的新闻初稿</li>
+        <li><strong>全链路覆盖</strong>：从文字撰稿到视频生成，从配图设计到多语言翻译，AI 贯穿内容生产每个环节</li>
         <li><strong>风格自适应</strong>：学习媒体历史稿件风格，自动匹配严肃新闻、深度报道、快讯、评论等不同文体</li>
         <li><strong>多版本输出</strong>：一键生成长文、短讯、微博、短视频脚本等多个版本，适配不同发布渠道</li>
         <li><strong>人机协作流程</strong>：AI 负责信息组织和初稿撰写，记者专注事实核查、深度采访和观点提炼</li>
       </ul>
       <div class="detail-highlight">
         <strong>3.2×</strong>
-        <span>生产效率提升——引入 AI 撰稿工具后的平均产出增幅</span>
-      </div>
-    </article>
-
-    <article class="detail-section" id="multimedia-generation">
-      <h3>场景二：多媒体生成</strong></h3>
-      <p>一篇文字稿的价值不再局限于文字本身。AI 能够将同一内容自动转化为视频、信息图、音频播客等多种形态，实现"一次生产，多次利用"。</p>
-      <ul>
-        <li><strong>文章转视频</strong>：自动提取文章关键段落，匹配素材库画面，生成带字幕和配音的短视频</li>
-        <li><strong>AI 配图</strong>：根据文章主题和情感基调，自动生成或推荐匹配的封面图、插图和信息图</li>
-        <li><strong>智能剪辑</strong>：从原始采访素材中自动识别精彩片段，生成精华版短视频</li>
-        <li><strong>语音合成</strong>：将文字稿转为自然流畅的语音，支持多种音色和情绪风格，用于播客和音频新闻</li>
-      </ul>
-      <div class="detail-highlight">
-        <strong>5min</strong>
-        <span>文章转视频的平均生成时间</span>
-      </div>
-    </article>
-
-    <article class="detail-section" id="multilingual-adaptation">
-      <h3>场景三：多语言适配</h3>
-      <p>全球化传播需求下，内容的跨语言适配不再是"翻译完就完事"。AI 多语言系统能够理解文化语境，保持原文风格和语气，实现真正的本地化输出。</p>
-      <ul>
-        <li><strong>语义级翻译</strong>：超越字面翻译，理解上下文语境、行业术语和文化隐喻，输出地道表达</li>
-        <li><strong>风格保持</strong>：在翻译过程中保持原文的叙述节奏、情感色彩和品牌调性</li>
-        <li><strong>实时同步</strong>：原文发布后自动触发多语言版本生成，实现全球同步发布</li>
-        <li><strong>质量评估</strong>：自动检测翻译中的不一致、遗漏和不当表述，标注待人工复核部分</li>
-      </ul>
-      <div class="detail-highlight">
-        <strong>50+</strong>
-        <span>支持语言覆盖——从主流语种到区域方言</span>
+        <span>生产效率提升——引入 AI 内容生产工具后的平均产出增幅</span>
       </div>
     </article>
 
