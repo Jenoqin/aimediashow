@@ -746,11 +746,9 @@
       renderStepChart(0);
       updateAnalysisMeta();
 
-      // 如果正在自动播放，重置计时器
-      if (isPlaying) {
-        clearInterval(playInterval);
-        startAutoPlay();
-      }
+      // 点击热点后默认自动播放（已在播放则重置计时器）
+      clearInterval(playInterval);
+      startAutoPlay();
     }
 
     // ====== 步骤指示器 ======
